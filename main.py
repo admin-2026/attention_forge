@@ -5,6 +5,7 @@ from config_loader import load_project_config, load_role_config
 from context_loader import load_context
 from openai_client import generate_response
 from chat_logger import log_chat
+from response_parser import process_openai_response
 
 def main():
     # Determine the project configuration file path
@@ -21,18 +22,23 @@ def main():
     # Load configurations and API key
     try:
         project_config = load_project_config(project_config_path)
-        role_config = load_role_config(role_name)  # Now loads based on role name
+        role_config = load_role_config(role_name)
         api_key = load_api_key()
     except Exception as e:
         print(e)
         sys.exit(1)
 
+    # Get user input
+    user_message = input("Enter your message (or type 'exit' to quit): ").strip().lower()
+
+    # Check if user wants to exit
+    if user_message == "exit":
+        print("Exiting the program. No request sent to OpenAI.")
+        sys.exit(0)
+
     # Load context files (optional)
     context_files = load_context()
     context_text = "\n".join(content for content in context_files.values()) if context_files else ""
-
-    # Get user input
-    user_message = input("Enter your message: ")
 
     # Modify developer message to include code context
     if context_text:
@@ -47,6 +53,10 @@ def main():
 
         # Log the full chat
         log_chat(project_config["log_file"], request_data, response_data)
+
+        # Process response for file updates
+        process_openai_response(assistant_reply)
+
     except Exception as e:
         print("An error occurred while communicating with OpenAI:", e)
 

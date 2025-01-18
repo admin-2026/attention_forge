@@ -23,3 +23,6 @@ api-key
 # Ignore system-specific files
 .DS_Store
 Thumbs.db
+
+# Ignore backup folder
+backup/

@@ -1,7 +1,10 @@
 import openai
 
-def generate_response(api_key, role_config, user_message):
+def generate_response(api_key, project_config, role_config, user_message):
     """Calls OpenAI API and returns the request, response, and assistant reply."""
+
+    # Retrieve model from project config
+    model = project_config.get("model", "gpt-4-turbo")
 
     # Extract optional system and assistant messages
     developer_message = role_config.get("developer_message", "")
@@ -13,11 +16,13 @@ def generate_response(api_key, role_config, user_message):
         messages.append({"role": "system", "content": developer_message})
     if assistant_message:
         messages.append({"role": "assistant", "content": assistant_message})
+
+    # Add the latest user message
     messages.append({"role": "user", "content": user_message})
 
     # Prepare request data
     request_data = {
-        "model": "gpt-4-turbo",
+        "model": model,  # Use model from config
         "messages": messages
     }
 

@@ -1,1 +1,2 @@
 log_file: "chat_history.log"
+model: "gpt-4-turbo"

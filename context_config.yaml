@@ -1,7 +1,8 @@
 include_paths:
   - Makefile
-  # - "main.py"
-  # - "config_loader.py"
+  - "main.py"
+  - "project_config.yaml"
+  - "context_config.yaml"
   # - "sample_context/file1.txt"
 
 # ignore_paths:

@@ -19,20 +19,21 @@ def main():
         print(f"Error: Project config file '{project_config_path}' not found.")
         sys.exit(1)
 
-    # Load configurations and API key
+    # Load configurations
     try:
         project_config = load_project_config(project_config_path)
         role_config = load_role_config(role_name)
-        api_key = load_api_key()
+        api_key_path = project_config.get("api_key_file", "api-key")  # Get API key location
+        api_key = load_api_key(api_key_path)  # Pass API key location directly
     except Exception as e:
         print(e)
         sys.exit(1)
 
     # Get user input
-    user_message = input("Enter your message (or type 'exit' to quit): ").strip().lower()
+    user_message = input("Enter your message (or type 'exit' to quit): ").strip()
 
     # Check if user wants to exit
-    if user_message == "exit":
+    if user_message.lower() == "exit":
         print("Exiting the program. No request sent to OpenAI.")
         sys.exit(0)
 

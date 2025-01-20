@@ -1,14 +1,14 @@
 import sys
 import os
+import uuid  # Import for generating unique Run IDs
 from api_key_loader import load_api_key
 from config_loader import load_project_config, load_role_config
-from context_loader import load_context  # Now requires API key path
+from context_loader import load_context
 from openai_client import generate_response
 from chat_logger import log_chat
 from response_parser import process_openai_response
 from user_input_handler import get_user_message
 from file_manager import set_run_id
-import uuid  # Import for generating unique Run IDs
 
 def main():
     # Generate a unique run ID for this execution
@@ -55,6 +55,12 @@ def main():
             api_key, project_config, role_config, user_message
         )
         print("OpenAI Assistant:", assistant_reply)
+
+        # Extract token usage safely
+        token_usage = response_data["usage"]
+        print(f"📊 Token Usage - Prompt: {token_usage['prompt_tokens']}, "
+              f"Completion: {token_usage['completion_tokens']}, "
+              f"Total: {token_usage['total_tokens']}")
 
         # Log the full chat
         log_chat(project_config["log_file"], request_data, response_data)

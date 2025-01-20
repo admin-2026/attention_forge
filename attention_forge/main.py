@@ -43,6 +43,7 @@ def main():
         project_config = load_project_config(project_config_path)
         role_config = load_role_config(role_name)
         api_key_path = project_config.get("api_key_file", "api-key")  # Retrieve API key file path
+        user_message_file_path = project_config.get("user_message_file", "")  # Retrieve user message file path
         api_key = load_api_key(api_key_path)  # Load API key
     except Exception as e:
         print(f"Configuration error: {e}")
@@ -51,7 +52,7 @@ def main():
     print(f"🆔 Run ID: {run_id}")  # Display Run ID for tracking
 
     # Get user message through input handler
-    user_message = get_user_message()
+    user_message = get_user_message(user_message_file_path)
 
     # Load relevant context files while ensuring API key is excluded
     context_files = load_context(api_key_path)

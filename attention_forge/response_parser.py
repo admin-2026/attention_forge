@@ -4,7 +4,7 @@ from attention_forge.file_manager import update_file
 def extract_code_blocks(response_text):
     """
     Extracts file names and code blocks from OpenAI responses.
-    
+
     Expected OpenAI Response Format:
     ```
     ### `filename.ext`
@@ -14,8 +14,8 @@ def extract_code_blocks(response_text):
     ```
     """
     # Updated regex pattern: Extracts filenames inside backticks (`file.ext`)
-    pattern = r"###\s+`(.+?)`\s*\n```(\w+)?\n(.*?)\n```"
-    
+    pattern = r"###\s*`(.+?)`\s*\n```(\w+)?\n(.*?)\n```"
+
     matches = re.findall(pattern, response_text, re.DOTALL)
 
     extracted_files = []

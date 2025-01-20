@@ -1,3 +1,4 @@
 log_file: "attention_forge_build/chat_history.log"
 model: "gpt-4o"
 api_key_file: "api-key"  # Optional, default to "api-key" in the current directory
+user_message_file: "user_message.txt"

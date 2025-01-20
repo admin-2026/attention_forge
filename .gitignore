@@ -30,3 +30,6 @@ attention_forge_build/
 # Ignore python setuptools generated files
 attention_forge.egg-info
 build/
+
+# Ignore user message
+user_message.txt

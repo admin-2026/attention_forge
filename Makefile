@@ -40,13 +40,8 @@ install-package:  ## Install Attention Forge as a local package
 uninstall:  ## Uninstall Attention Forge package
 	$(PYTHON) -m pip uninstall -y attention_forge
 
-# Run the main script with the default role
-run:  ## Run Attention Forge with the default role
-	@$(CHECK_PROJECT_CONFIG)
-	$(PYTHON) attention_forge/main.py $(PROJECT_CONFIG) $(DEFAULT_ROLE)
-
 # Run the main script with the developer assistant role
-dev:  ## Run Attention Forge with the developer assistant role
+run:  ## Run Attention Forge with the developer assistant role
 	@$(CHECK_PROJECT_CONFIG)
 	$(PYTHON) attention_forge/main.py $(PROJECT_CONFIG) $(DEV_ROLE)
 
@@ -91,8 +86,7 @@ help:
 	@echo "  install              - Install required dependencies"
 	@echo "  install-package      - Install Attention Forge as a local package"
 	@echo "  uninstall            - Uninstall Attention Forge package"
-	@echo "  run                  - Run Attention Forge with the default role"
-	@echo "  dev                  - Run Attention Forge with the developer assistant role"
+	@echo "  run                  - Run Attention Forge with the developer assistant role"
 	@echo "  run-role ROLE=<role> - Run Attention Forge with a custom role"
 	@echo "  revert               - Revert a file from the latest backup"
 	@echo "  format               - Format code using black"

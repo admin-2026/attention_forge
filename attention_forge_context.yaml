@@ -1,5 +1,8 @@
 include_paths:
-    - ./
+    - "./"
+    # - "attention_forge/main.py"
+    # - "attention_forge/response_parser.py"
+    # - "attention_forge/role_configs/dev_assistant.yaml"
 
 ignore_paths:
     - "attention_forge_build/"

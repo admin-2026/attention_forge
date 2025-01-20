@@ -1,13 +1,20 @@
 import sys
 import os
+import uuid  # Import for generating unique Run IDs
 from api_key_loader import load_api_key
 from config_loader import load_project_config, load_role_config
 from context_loader import load_context
 from openai_client import generate_response
 from chat_logger import log_chat
 from response_parser import process_openai_response
+from user_input_handler import get_user_message
+from file_manager import set_run_id  # Import to set Run ID
 
 def main():
+    # Generate a unique run ID for this execution
+    run_id = str(uuid.uuid4())  # Generate a UUID for the run
+    set_run_id(run_id)  # Pass Run ID to file manager for logging
+
     # Determine the project configuration file path
     project_config_path = sys.argv[1] if len(sys.argv) > 1 else "attention_forge_project.yaml"
 
@@ -29,13 +36,10 @@ def main():
         print(e)
         sys.exit(1)
 
-    # Get user input
-    user_message = input("Enter your message (or type 'exit' to quit): ").strip()
+    print(f"🆔 Run ID: {run_id}")
 
-    # Check if user wants to exit
-    if user_message.lower() == "exit":
-        print("Exiting the program. No request sent to OpenAI.")
-        sys.exit(0)
+    # Get user input using the new handler
+    user_message = get_user_message()
 
     # Load context files (optional)
     context_files = load_context()

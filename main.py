@@ -9,7 +9,7 @@ from response_parser import process_openai_response
 
 def main():
     # Determine the project configuration file path
-    project_config_path = sys.argv[1] if len(sys.argv) > 1 else "project_config.yaml"
+    project_config_path = sys.argv[1] if len(sys.argv) > 1 else "attention_forge_project.yaml"
 
     # Determine the role name (default if not specified)
     role_name = sys.argv[2] if len(sys.argv) > 2 else "default"

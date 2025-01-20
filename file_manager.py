@@ -2,10 +2,11 @@ import os
 import shutil
 import datetime
 
-BACKUP_DIR = "backup/"
+BUILD_DIR = "attention_forge_build/"
+BACKUP_DIR = os.path.join(BUILD_DIR, "backup/")
 
 def ensure_backup_directory():
-    """Ensure the backup directory exists."""
+    """Ensure the attention_forge_build/backup directory exists."""
     if not os.path.exists(BACKUP_DIR):
         os.makedirs(BACKUP_DIR)
 

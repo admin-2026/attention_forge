@@ -1,14 +1,14 @@
 import sys
 import os
-import uuid  # Import for generating unique Run IDs
 from api_key_loader import load_api_key
 from config_loader import load_project_config, load_role_config
-from context_loader import load_context
+from context_loader import load_context  # Now requires API key path
 from openai_client import generate_response
 from chat_logger import log_chat
 from response_parser import process_openai_response
 from user_input_handler import get_user_message
-from file_manager import set_run_id  # Import to set Run ID
+from file_manager import set_run_id
+import uuid  # Import for generating unique Run IDs
 
 def main():
     # Generate a unique run ID for this execution
@@ -41,8 +41,8 @@ def main():
     # Get user input using the new handler
     user_message = get_user_message()
 
-    # Load context files (optional)
-    context_files = load_context()
+    # Load context files, passing the API key path to ensure it's ignored
+    context_files = load_context(api_key_path)
     context_text = "\n".join(content for content in context_files.values()) if context_files else ""
 
     # Modify developer message to include code context

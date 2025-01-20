@@ -1,0 +1,9 @@
+include_paths:
+    - ./
+
+ignore_paths:
+    - "attention_forge_build/"
+    - "__pycache__/"
+    - "./.git/"
+    - "attention_forge_context.yaml"
+    - "note.txt"

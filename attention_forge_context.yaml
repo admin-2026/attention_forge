@@ -1,8 +1,12 @@
+# tree_paths: # include directory tree structures as context
+#    - "./"
+
 include_paths:
     # - "./"
     - "attention_forge/main.py"
     - "attention_forge/context_loader.py"
     - "attention_forge/user_input_handler.py"
+    - "attention_forge_context.yaml"
     # - "attention_forge/response_parser.py"
     # - "attention_forge/role_configs/dev_assistant.yaml"
 
@@ -12,5 +16,5 @@ ignore_paths:
     - "./.git/"
     - "build/"
     - "attention_forge.egg-info/"
-    - "attention_forge_context.yaml"
+    # - "attention_forge_context.yaml"
     - "note.txt"

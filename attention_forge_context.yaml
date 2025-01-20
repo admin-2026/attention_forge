@@ -3,7 +3,9 @@ include_paths:
 
 ignore_paths:
     - "attention_forge_build/"
-    - "__pycache__/"
+    - "attention_forge/__pycache__/"
     - "./.git/"
+    - "build/"
+    - "attention_forge.egg-info/"
     - "attention_forge_context.yaml"
     - "note.txt"

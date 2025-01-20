@@ -26,3 +26,7 @@ Thumbs.db
 
 # Ignore Attention Forge build artifacts
 attention_forge_build/
+
+# Ignore python setuptools generated files
+attention_forge.egg-info
+build/

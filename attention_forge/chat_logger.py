@@ -1,7 +1,7 @@
 import os
 import json
 import logging
-from config_loader import load_project_config
+from attention_forge.config_loader import load_project_config
 
 # Ensure build directory exists
 BUILD_DIR = "attention_forge_build/"

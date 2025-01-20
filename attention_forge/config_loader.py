@@ -1,8 +1,10 @@
 import yaml
 import os
+from importlib.resources import files
 
-ROLE_CONFIG_DIR = "role_configs/"
-META_CONFIG_PATH = os.path.join(ROLE_CONFIG_DIR, "meta.yaml")
+# Use importlib.resources to define the role config directory
+ROLE_CONFIG_DIR = files('attention_forge').joinpath('role_configs')
+META_CONFIG_PATH = ROLE_CONFIG_DIR / "meta.yaml"
 
 # Updated filenames
 PROJECT_CONFIG_FILE = "attention_forge_project.yaml"
@@ -39,9 +41,9 @@ def load_role_config(role_name="default"):
         raise ValueError(f"Error: Role '{role_name}' not found in meta.yaml.")
 
     role_file = role_mapping[role_name]
-    role_config_path = os.path.join(ROLE_CONFIG_DIR, role_file)
+    role_config_path = ROLE_CONFIG_DIR / role_file
 
-    if not os.path.exists(role_config_path):
+    if not role_config_path.exists():
         raise FileNotFoundError(f"Error: Role config file '{role_config_path}' does not exist.")
 
     return load_config(role_config_path)

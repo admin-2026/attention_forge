@@ -1,4 +1,4 @@
-from file_manager import revert_file
+from attention_forge.file_manager import revert_file
 
 def get_user_message():
     """

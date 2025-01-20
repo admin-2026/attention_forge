@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "attention_forge"
+version = "0.1.0"
+description = "A tool for AI-assisted coding with automated file updates and backups."
+readme = "README.md"
+requires-python = ">=3.8"
+license = {text = "MIT"}
+dependencies = [
+    "openai>=1.0.0",
+    "pyyaml"
+]
+
+[project.scripts]
+attention-forge = "attention_forge.main:main"

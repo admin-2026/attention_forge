@@ -23,23 +23,35 @@ else
     CHECK_PROJECT_CONFIG = if [ ! -f $(PROJECT_CONFIG) ]; then echo "Error: '$(PROJECT_CONFIG)' file not found."; exit 1; fi
 endif
 
+# Generate requirements.txt from installed packages
+requirements:
+	pip freeze > requirements.txt
+
 # Install dependencies
-install:
+install:  ## Install required dependencies
 	$(PYTHON) -m pip install --upgrade pip
 	$(PYTHON) -m pip install -r requirements.txt || $(PYTHON) -m pip install openai pyyaml
 
+# Install Attention Forge as a local package
+install-package:  ## Install Attention Forge as a local package
+	$(PYTHON) -m pip install .
+
+# Uninstall Attention Forge
+uninstall:  ## Uninstall Attention Forge package
+	$(PYTHON) -m pip uninstall -y attention_forge
+
 # Run the main script with the default role
-run:
+run:  ## Run Attention Forge with the default role
 	@$(CHECK_PROJECT_CONFIG)
-	$(PYTHON) main.py $(PROJECT_CONFIG) $(DEFAULT_ROLE)
+	$(PYTHON) attention_forge/main.py $(PROJECT_CONFIG) $(DEFAULT_ROLE)
 
 # Run the main script with the developer assistant role
-dev:
+dev:  ## Run Attention Forge with the developer assistant role
 	@$(CHECK_PROJECT_CONFIG)
-	$(PYTHON) main.py $(PROJECT_CONFIG) $(DEV_ROLE)
+	$(PYTHON) attention_forge/main.py $(PROJECT_CONFIG) $(DEV_ROLE)
 
 # Run the script with a custom role
-run-role:
+run-role:  ## Run Attention Forge with a custom role (use ROLE=<role_name>)
 	@$(CHECK_PROJECT_CONFIG)
 	@if [ -z "$(ROLE)" ]; then \
 		echo "Error: Please specify a role using ROLE=<role_name>"; \
@@ -48,16 +60,16 @@ run-role:
 	$(PYTHON) main.py $(PROJECT_CONFIG) $(ROLE)
 
 # Run the script to revert a file from the latest backup
-revert:
+revert:  ## Revert a file from the latest backup
 	@$(CHECK_PROJECT_CONFIG)
 	$(PYTHON) main.py revert
 
 # Check Python formatting with black
-format:
+format:  ## Format code using black
 	$(PYTHON) -m black *.py
 
 # Clean up Python cache files and logs (Cross-Platform)
-clean:
+clean:  ## Remove cache files, logs, and backups
 ifeq ($(OS), Windows)
 	@if exist $(BUILD_DIR)\backup rmdir /S /Q $(BUILD_DIR)\backup 2>nul
 	@if exist $(BUILD_DIR)\backup_log.json del /S /Q $(BUILD_DIR)\backup_log.json 2>nul
@@ -74,12 +86,16 @@ endif
 
 # Display help
 help:
-	@echo "Makefile commands:"
-	@echo "  make install      Install dependencies"
-	@echo "  make run          Run the assistant with the default role"
-	@echo "  make dev          Run the assistant with the developer assistant role"
-	@echo "  make run-role ROLE=<role_name>  Run the assistant with a custom role"
-	@echo "  make revert       Revert a file from the latest backup"
-	@echo "  make format       Format code using black"
-	@echo "  make clean        Remove cache files and logs"
-	@echo "  make help         Show available commands"
+	@echo ""
+	@echo "Available Makefile commands:"
+	@echo "  install              - Install required dependencies"
+	@echo "  install-package      - Install Attention Forge as a local package"
+	@echo "  uninstall            - Uninstall Attention Forge package"
+	@echo "  run                  - Run Attention Forge with the default role"
+	@echo "  dev                  - Run Attention Forge with the developer assistant role"
+	@echo "  run-role ROLE=<role> - Run Attention Forge with a custom role"
+	@echo "  revert               - Revert a file from the latest backup"
+	@echo "  format               - Format code using black"
+	@echo "  clean                - Remove cache files, logs, and backups"
+	@echo "  help                 - Show available commands"
+	@echo ""

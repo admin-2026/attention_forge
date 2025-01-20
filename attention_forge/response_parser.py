@@ -1,5 +1,5 @@
 import re
-from file_manager import update_file
+from attention_forge.file_manager import update_file
 
 def extract_code_blocks(response_text):
     """

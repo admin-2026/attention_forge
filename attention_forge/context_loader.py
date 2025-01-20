@@ -35,19 +35,19 @@ def get_files_from_directory(directory, ignore_paths):
     if any(abs_directory.startswith(ignored) for ignored in ignore_paths):
         print(f"❌ Skipping traversal of ignored directory: {directory}")
         return []
-    
+
     print(f"📂 Scanning directory: {directory}")
     all_files = []
-    
+
     for root, dirs, files in os.walk(directory):
         abs_root = os.path.abspath(root)
-        
+
         # Check if the current directory (or any of its parent paths) is in ignore list
         if any(abs_root.startswith(ignored) for ignored in ignore_paths):
             print(f"❌ Skipping traversal of ignored directory: {root}")
             dirs[:] = []  # Modify dirs in-place to prevent descending into ignored directories
             continue
-        
+
         for file in files:
             file_path = os.path.join(root, file)
             abs_file_path = os.path.abspath(file_path)
@@ -57,18 +57,19 @@ def get_files_from_directory(directory, ignore_paths):
             else:
                 print(f"✅ Loading file: {file_path}")
                 all_files.append(file_path)
-    
+
     return all_files
 
 def load_context(api_key_path):
     """Load file contents while ignoring specified paths, including API key path."""
     config = load_context_config()
-    
+
     include_paths = config.get("include_paths", [])  # Default to empty list
     ignore_paths = normalize_paths(config.get("ignore_paths", []))  # Convert to absolute paths
     ignore_paths.add(os.path.abspath(api_key_path))  # Ensure API key file is always ignored
 
     loaded_files = {}
+    loading_error = False
 
     if not include_paths:
         print("ℹ️ No files or directories specified in include_paths. Skipping context loading.")
@@ -104,5 +105,13 @@ def load_context(api_key_path):
                     loaded_files[file_path] = formatted_content
             except Exception as e:
                 print(f"🚨 Warning: Could not read {file_path}. Error: {e}")
+                loading_error = True
+
+    if loading_error:
+        # Ask the user if they want to proceed despite errors
+        proceed = input("Some files could not be loaded. Do you want to proceed? (yes/no): ")
+        if proceed.lower() != 'yes':
+            print("Operation aborted by user.")
+            exit(0)
 
     return loaded_files

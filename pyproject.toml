@@ -16,3 +16,4 @@ dependencies = [
 
 [project.scripts]
 attention-forge = "attention_forge.main:main"
+attention-forge-init = "attention_forge.setup_tool:main"

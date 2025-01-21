@@ -28,12 +28,12 @@ requirements:
 	pip freeze > requirements.txt
 
 # Install dependencies
-install:  ## Install required dependencies
+install-dependencies:  ## Install required dependencies
 	$(PYTHON) -m pip install --upgrade pip
 	$(PYTHON) -m pip install -r requirements.txt || $(PYTHON) -m pip install openai pyyaml
 
 # Install Attention Forge as a local package
-install-package:  ## Install Attention Forge as a local package
+install:  ## Install Attention Forge as a local package
 	$(PYTHON) -m pip install .
 
 # Uninstall Attention Forge

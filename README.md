@@ -9,6 +9,7 @@ Attention Forge is a flexible framework for using OpenAI's GPT models to assist 
 - **API Key Management**: Securely manage OpenAI API keys through configuration files.
 - **Logging and Backup**: Log chat history and backup files before updating them based on assistant responses.
 - **Makefile Automation**: Use the Makefile for easy installation, running, formatting, cleaning, and role management.
+- **Project Initialization**: Quickly set up new projects with default configurations using the `attention-forge-init` command.
 
 ## Getting Started
 
@@ -23,6 +24,19 @@ Install dependencies using the Makefile:
    ```bash
    make install
    ```
+
+### Using the Init Command
+
+Use the `attention-forge-init` command to initialize a new project environment with default configurations. This command will create necessary configuration files and directories.
+
+   ```bash
+   attention-forge-init
+   ```
+
+This command will:
+- Create the `attention_forge_build` directory if it does not exist.
+- Initialize `attention_forge_context.yaml` and `attention_forge_project.yaml` with default values.
+- Update the `.gitignore` to prevent versioning of the build directory.
 
 ### Configuration
 

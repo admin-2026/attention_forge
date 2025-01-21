@@ -120,6 +120,7 @@ def load_context(api_key_path):
             files = [abs_path]
         else:
             print(f"⚠️ Skipping invalid path: {path}")
+            loading_error = True
             continue
 
         # Read the content of each file

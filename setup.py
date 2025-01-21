@@ -18,11 +18,6 @@ setup(
         "openai>=1.0.0",
         "pyyaml"
     ],
-    entry_points={
-        "console_scripts": [
-            "attention-forge=attention_forge.main:main",
-        ],
-    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",

@@ -39,19 +39,25 @@ def create_or_update_yaml(file_path, defaults, message):
     print(f"✅ {message}")
 
 def update_gitignore():
-    """Add attention_forge_build/ to .gitignore if not already present."""
-    line_to_add = f"{BUILD_DIR}/"
-    
+    """Add paths to .gitignore if not already present."""
+    lines_to_add = [
+        f"{BUILD_DIR}/",
+        CONTEXT_FILE,
+        PROJECT_FILE
+    ]
+
+    existing_lines = []
     if os.path.exists(GITIGNORE_FILE):
         with open(GITIGNORE_FILE, 'r') as file:
-            lines = file.readlines()
-            if line_to_add in lines:
-                print(f"ℹ️ {line_to_add.strip()} is already in {GITIGNORE_FILE}")
-                return
+            existing_lines = file.readlines()
 
     with open(GITIGNORE_FILE, 'a') as file:
-        file.write(f"{line_to_add}\n")
-    print(f"✅ Added {line_to_add.strip()} to {GITIGNORE_FILE}")
+        for line in lines_to_add:
+            if f"{line}\n" not in existing_lines:
+                file.write(f"{line}\n")
+                print(f"✅ Added {line} to {GITIGNORE_FILE}")
+            else:
+                print(f"ℹ️ {line} is already in {GITIGNORE_FILE}")
 
 def main():
     """Initialize the project environment for Attention Forge."""

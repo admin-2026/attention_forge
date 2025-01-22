@@ -33,3 +33,7 @@ build/
 
 # Ignore user message
 user_message.txt
+
+# Ignore attention-forge configs
+attention_forge_context.yaml
+attention_forge_project.yaml

@@ -1,9 +1,0 @@
-log_file: "attention_forge_build/chat_history.log"
-api_key_file: "api-key"  # Optional, default to "api-key" in the current directory
-user_message_file: "user_message.txt"
-
-model: "gpt-4o"
-client: "openai"  # Added client selection
-
-# model: "llama3.2"
-# client: "ollama"  # Added client selection

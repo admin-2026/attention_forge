@@ -1,4 +1,5 @@
 import openai
+from attention_forge.message_constructor import construct_messages
 
 def create_openai_client(api_key):
     """Create an OpenAI client instance with the provided API key."""
@@ -10,11 +11,7 @@ def generate_response(api_key, project_config, role_config, user_message):
 
     client = create_openai_client(api_key)  # Initialize client with API key
 
-    messages = [
-        {"role": "system", "content": role_config.get("developer_message", "")},
-        {"role": "assistant", "content": role_config.get("assistant_message", "")},  # Ensure assistant message is included
-        {"role": "user", "content": user_message},
-    ]
+    messages = construct_messages(role_config, user_message)
 
     response = client.chat.completions.create(
         model=model,
@@ -24,8 +21,8 @@ def generate_response(api_key, project_config, role_config, user_message):
     # Extract response data
     assistant_reply = response.choices[0].message.content
     request_data = {"model": model, "messages": messages}
-    
-    # Extract token usage correctly (without using `.get()`)
+
+    # Extract token usage correctly
     token_usage = {
         "prompt_tokens": response.usage.prompt_tokens,
         "completion_tokens": response.usage.completion_tokens,

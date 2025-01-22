@@ -9,7 +9,7 @@ setup(
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
     url="https://github.com/your-repo/attention_forge",
-    packages=find_packages(include=["attention_forge", "attention_forge.*"]),
+    packages=find_packages(include=["attention_forge", "attention_forge.*", "attention_forge.clients"]),
     include_package_data=True,
     package_data={
         "attention_forge": ["role_configs/*.yaml"]  # Include YAML configuration files

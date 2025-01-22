@@ -9,9 +9,10 @@ from attention_forge.response_parser import process_openai_response
 from attention_forge.user_input_handler import get_user_message
 from attention_forge.file_manager import set_run_id
 
-# Import both clients
+# Import the clients
 from attention_forge.clients.openai_client import generate_response as openai_generate_response
 from attention_forge.clients.ollama_client import generate_ollama_response
+from attention_forge.clients.rbx_client import RBXClient
 
 def main():
     run_id = str(uuid.uuid4())
@@ -50,12 +51,17 @@ def main():
             request_data, response_data, assistant_reply = generate_ollama_response(
                 api_key, project_config, role_config, user_message
             )
+        elif client_type == "rbx":
+            rbx_client = RBXClient(api_key)
+            request_data, response_data, assistant_reply = rbx_client.generate_response(
+                project_config, role_config, user_message
+            )
         else:
             request_data, response_data, assistant_reply = openai_generate_response(
                 api_key, project_config, role_config, user_message
             )
 
-        print("OpenAI Assistant:" if client_type == "openai" else "Ollama Assistant:", assistant_reply)
+        print(f"{client_type.capitalize()} Assistant:", assistant_reply)
 
         token_usage = response_data["usage"]
         print(f"📊 Token Usage - Prompt: {token_usage['prompt_tokens']}, "

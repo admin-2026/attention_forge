@@ -1,50 +1,62 @@
 # Attention Forge
 
-Attention Forge is a flexible framework for using OpenAI's GPT models to assist with coding tasks, chat interactions, and managing project configurations. It provides functionalities such as role-based assistant behavior, context loading, API key management, and automated backup and update of code files.
+Attention Forge is a flexible framework for using AI models such as OpenAI's GPT or custom models to assist with coding tasks, chat interactions, and managing project configurations. It provides functionalities such as role-based assistant behavior, context loading, API key management, and automated backup and update of code files.
 
 ## Features
 
 - **Role-Based Assistant**: Define assistant behavior and responses based on roles specified in YAML configuration files.
 - **Context Loading**: Load relevant project files and directories to provide context for the assistant.
-- **API Key Management**: Securely manage OpenAI API keys through configuration files.
+- **API Key Management**: Securely manage API keys for OpenAI and other clients through configuration files.
 - **Logging and Backup**: Log chat history and backup files before updating them based on assistant responses.
 - **Makefile Automation**: Use the Makefile for easy installation, running, formatting, cleaning, and role management.
 - **Project Initialization**: Quickly set up new projects with default configurations using the `attention-forge-init` command.
+
+## Supported Clients
+
+Attention Forge supports multiple AI clients, each with unique capabilities:
+
+### OpenAI
+- **Usage**:
+  OpenAI clients are used to interact with models like GPT-4. You can configure it by specifying the `client: "openai"` in your project configuration file. Ensure your API key is correctly set in the `api-key` file or specified path.
+
+### Ollama
+- **Usage**:
+  Ollama allows you to interact with llm running at your local machine. Set `client: "ollama"` in the configuration.
+
+### RBX
+- **Usage**:
+  RBX is another supported client, where you specify `client: "rbx"` in the configuration. The RBX client uses custom API endpoints, defined in `gateway_base_url`, to request specific model responses. Ensure `max_tokens` and `model` are set as required.
 
 ## Getting Started
 
 ### Prerequisites
 
-- Python 3.x
-- OpenAI API Key
+- Python 3.8 or higher
+- API Key for the selected client (OpenAI, Ollama, or RBX)
 
 ### Installation
 
 Install dependencies using the Makefile:
-   ```bash
-   make install
-   ```
+
+```bash
+make install
+```
 
 ### Using the Init Command
 
 Use the `attention-forge-init` command to initialize a new project environment with default configurations. This command will create necessary configuration files and directories.
 
-   ```bash
-   attention-forge-init
-   ```
-
-This command will:
-- Create the `attention_forge_build` directory if it does not exist.
-- Initialize `attention_forge_context.yaml` and `attention_forge_project.yaml` with default values.
-- Update the `.gitignore` to prevent versioning of the build directory.
+```bash
+attention-forge-init
+```
 
 ### Configuration
 
 1. **API Key**:
-   - Place your OpenAI API key in a file named `api-key` in the project's root directory or specify a different path in `attention_forge_project.yaml`.
+   - Place your API key in a file named `api-key` in the project's root directory or specify a different path in `attention_forge_project.yaml`.
 
 2. **Project Configuration**:
-   - Edit `attention_forge_project.yaml` to customize the default settings like logging and model version.
+   - Edit `attention_forge_project.yaml` to customize settings like logging, model version, and client type.
 
 3. **Role Configuration**:
    - Define roles and their behaviors in YAML files under `role_configs/` and map them in `role_configs/meta.yaml`.

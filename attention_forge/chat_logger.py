@@ -8,14 +8,16 @@ BUILD_DIR = "attention_forge_build/"
 if not os.path.exists(BUILD_DIR):
     os.makedirs(BUILD_DIR)
 
-def log_chat(log_file, request_data, response_data):
-    """Logs the full request and response to a file inside attention_forge_build."""
+def log_chat(log_file, request_data, response_data, client_name, model_name):
+    """Logs the full request and response along with client and model info to a file inside attention_forge_build."""
     log_path = os.path.join(BUILD_DIR, os.path.basename(log_file))
 
     logging.basicConfig(filename=log_path, level=logging.INFO, format="%(asctime)s - %(message)s")
 
     log_entry = {
         "timestamp": logging.Formatter().formatTime(logging.makeLogRecord({})),
+        "client_name": client_name,
+        "model_name": model_name,
         "request": request_data,
         "response": response_data
     }

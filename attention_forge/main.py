@@ -32,6 +32,7 @@ def main():
         user_message_file_path = project_config.get("user_message_file", "")
         api_key = load_api_key(api_key_path)
         client_type = project_config.get("client", "openai")  # Retrieve client type
+        model_name = project_config.get("model", "")
     except Exception as e:
         print(f"Configuration error: {e}")
         sys.exit(1)
@@ -68,7 +69,7 @@ def main():
               f"Completion: {token_usage['completion_tokens']}, "
               f"Total: {token_usage['total_tokens']}")
 
-        log_chat(project_config["log_file"], request_data, response_data)
+        log_chat(project_config["log_file"], request_data, response_data, client_type, model_name)
         process_openai_response(assistant_reply)
 
     except Exception as e:

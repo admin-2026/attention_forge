@@ -3,7 +3,11 @@ from attention_forge.message_constructor import construct_messages
 
 def generate_ollama_response(api_key, project_config, role_config, user_message):
     """Generate a response from Ollama using the ossama library."""
-    model = project_config.get("model", "ollama-turbo")
+
+    # Load model from project configuration
+    model = project_config.get("model")
+    if not model:
+        raise ValueError("Model name not found in project configuration.")
 
     messages = construct_messages(role_config, user_message)
 

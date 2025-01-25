@@ -5,14 +5,9 @@ from attention_forge.api_key_loader import load_api_key
 from attention_forge.config_loader import load_project_config, load_role_config
 from attention_forge.context_loader import load_context
 from attention_forge.chat_logger import log_chat
-from attention_forge.response_parser import process_openai_response
 from attention_forge.user_input_handler import get_user_message
 from attention_forge.file_manager import set_run_id
-
-# Import the clients
-from attention_forge.clients.openai_client import generate_response as openai_generate_response
-from attention_forge.clients.ollama_client import generate_ollama_response
-from attention_forge.clients.rbx_client import RBXClient
+from attention_forge.chat import Chat  # Import the new Chat class
 
 def main():
     run_id = str(uuid.uuid4())
@@ -31,7 +26,6 @@ def main():
         api_key_path = project_config.get("api_key_file", "api-key")
         user_message_file_path = project_config.get("user_message_file", "")
         api_key = load_api_key(api_key_path)
-        client_type = project_config.get("client", "openai")  # Retrieve client type
         model_name = project_config.get("model", "")
     except Exception as e:
         print(f"Configuration error: {e}")
@@ -46,31 +40,23 @@ def main():
     if context_text:
         role_config["developer_message"] += f"\n\nHere are some relevant code files:\n\n{context_text}"
 
-    # Select and use the appropriate client
-    try:
-        if client_type == "ollama":
-            request_data, response_data, assistant_reply = generate_ollama_response(
-                api_key, project_config, role_config, user_message
-            )
-        elif client_type == "rbx":
-            rbx_client = RBXClient(api_key)
-            request_data, response_data, assistant_reply = rbx_client.generate_response(
-                project_config, role_config, user_message
-            )
-        else:
-            request_data, response_data, assistant_reply = openai_generate_response(
-                api_key, project_config, role_config, user_message
-            )
+    # Create and run a Chat object
+    chat = Chat(api_key, project_config, role_config, user_message)
 
-        print(f"{client_type.capitalize()} Assistant:", assistant_reply)
+    try:
+        chat.run()
+        assistant_reply = chat.get_assistant_reply()
+        request_data = chat.get_request_data()
+        response_data = chat.get_response_data()
+
+        print(f"{project_config.get('client', 'openai').capitalize()} Assistant:", assistant_reply)
 
         token_usage = response_data["usage"]
         print(f"📊 Token Usage - Prompt: {token_usage['prompt_tokens']}, "
               f"Completion: {token_usage['completion_tokens']}, "
               f"Total: {token_usage['total_tokens']}")
 
-        log_chat(project_config["log_file"], request_data, response_data, client_type, model_name)
-        process_openai_response(assistant_reply)
+        log_chat(project_config["log_file"], request_data, response_data, project_config.get("client", "openai"), model_name)
 
     except Exception as e:
         print("An error occurred while communicating with the client:", e)

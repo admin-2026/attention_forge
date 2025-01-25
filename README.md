@@ -102,6 +102,26 @@ attention-forge-init
 - `role_configs/` - Configuration files for different assistant roles.
 - `attention_forge_build/` - Directory for logs and backups.
 
+## Plugins
+
+Attention Forge allows users to extend its functionality through plugins. This is useful for adding custom setup steps or initializing additional features.
+
+### Creating a Plugin
+
+1. Create a Python file inside the `attention_forge/setup_tools/plugins` directory.
+2. Define a `run()` function that contains the logic for your plugin.
+
+Example:
+
+```python
+def run():
+    print("This is a custom setup plugin.")
+```
+
+### Using Plugins
+
+Plugins are automatically discovered and executed when running the `attention-forge-init` command. Each plugin must define a `run()` function, which will be called during the initialization process.
+
 ## Contributing
 
 Contributions are welcome! Please fork the repository and submit a pull request for any new features or bug fixes.

@@ -1,12 +1,16 @@
 import os
 import subprocess  # Import subprocess to check for command-line tools
 import yaml
+import importlib.util
+import glob
+
 from attention_forge.setup_tools.model_checker import ModelChecker  # Import the new ModelChecker
 
 BUILD_DIR = 'attention_forge_build'
 CONTEXT_FILE = 'attention_forge_context.yaml'
 PROJECT_FILE = 'attention_forge_project.yaml'
 GITIGNORE_FILE = '.gitignore'
+PLUGIN_FOLDER = os.path.join(os.path.dirname(__file__), 'plugins')
 
 context_defaults = {
     'include_paths': ['./src', './scripts'],
@@ -120,21 +124,36 @@ def update_gitignore():
             else:
                 print(f"ℹ️ {line} is already in {GITIGNORE_FILE}")
 
+def load_plugins():
+    """Load and execute all plugins found in the plugins directory."""
+    plugin_files = glob.glob(os.path.join(PLUGIN_FOLDER, '*.py'))
+    for plugin_file in plugin_files:
+        plugin_name = os.path.splitext(os.path.basename(plugin_file))[0]
+        try:
+            spec = importlib.util.spec_from_file_location(plugin_name, plugin_file)
+            plugin_module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(plugin_module)
+            if hasattr(plugin_module, "run"):
+                plugin_module.run()  # Call the run function of the plugin
+        except Exception as e:
+            print(f"Error loading plugin {plugin_name}: {str(e)}")
+
 def main():
     """Initialize the project environment for Attention Forge."""
-    check_ollama_installed()  # Check for Ollama before setting up the environment
+    check_ollama_installed()
     create_build_directory()
     create_or_update_yaml(CONTEXT_FILE, context_defaults, f"Initialized {CONTEXT_FILE} with default values.")
 
-    # Initialize ModelChecker and determine which model to use
     model_checker = ModelChecker()
     base_model = model_checker.select_base_model()
-
-    # Add the base model to project defaults under a new config key, e.g., `base_model`
     project_defaults['base_model'] = base_model
 
     create_or_update_yaml(PROJECT_FILE, project_defaults, f"Initialized {PROJECT_FILE} with default values.")
     update_gitignore()
+
+    # Load and execute plugins
+    load_plugins()
+
     print("🎉 Project is ready for Attention Forge!")
 
 if __name__ == "__main__":

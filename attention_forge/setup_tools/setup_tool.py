@@ -1,5 +1,7 @@
 import os
+import subprocess  # Import subprocess to check for command-line tools
 import yaml
+from attention_forge.setup_tools.model_checker import ModelChecker  # Import the new ModelChecker
 
 BUILD_DIR = 'attention_forge_build'
 CONTEXT_FILE = 'attention_forge_context.yaml'
@@ -13,14 +15,25 @@ context_defaults = {
 }
 
 project_defaults = {
-    'log_file': 'attention_forge_build/chat_history.log',  # Log file path for chat history
-    'model': 'gpt-4o',  # Default model to use. Change as needed
-    'api_key_file': 'api-key',  # Path to the API key file
-    'user_message_file': 'user_message.txt',  # Path to the user message file
-    'client': 'openai',  # Set the client type: openai, ollama, or rbx
-    'gateway_base_url': "http://apis.example.com/",  # Base URL for the gateway (used with rbx client)
-    'max_tokens': 10000  # Maximum number of tokens (used with rbx client)
+    'log_file': 'attention_forge_build/chat_history.log',
+    'model': 'gpt-4o',
+    'api_key_file': 'api-key',
+    'user_message_file': 'user_message.txt',
+    'client': 'openai',
+    'gateway_base_url': "http://apis.example.com/",
+    'max_tokens': 10000,
+    'base_client': 'ollama',  # Default base client for Attention Forge
+    # base_model will be added dynamically
 }
+
+def check_ollama_installed():
+    """Check if ollama is installed by attempting to run 'ollama --version'."""
+    try:
+        subprocess.run(["ollama", "--version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        print("✅ Ollama is installed.")
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        print("❌ Ollama is not installed. Please install it before proceeding.")
+        exit(1)
 
 def create_build_directory():
     """Create the attention_forge_build directory if it doesn't exist."""
@@ -38,27 +51,35 @@ def create_or_update_yaml(file_path, defaults, message, with_comments=True):
             print(f"ℹ️ Preserving existing {file_path}.")
             return
 
+    # Ensure client is set to 'ollama' and model is set to 'base_model'
+    defaults['client'] = 'ollama'
+    if 'base_model' in defaults:
+        defaults['model'] = defaults['base_model']
+
     with open(file_path, 'w') as file:
         if with_comments:
-            file.write("# Configuration file\n")
+            file.write("# Configuration file for Attention Forge\n")
             file.write("#\n")
         for key, value in defaults.items():
             if with_comments:
-                # Add detailed comments for each config item
-                if key == 'include_paths':
+                if key == 'base_client':
+                    file.write("# Base client for Attention Forge's internal functions.\n")
+                elif key == 'base_model':
+                    file.write("# Base model for Attention Forge's internal functions.\n")
+                elif key == 'client':
+                    file.write("# Client type. Default is ollama. Update to use other clients like openai, rbx.\n")
+                elif key == 'model':
+                    file.write("# Model name to be used by the client. Default is the base model. Update to use different LLMs.\n")
+                elif key == 'include_paths':
                     file.write("# Include paths to specify directories/files that should be included explicitly.\n")
                 elif key == 'tree_paths':
                     file.write("# Tree paths to specify directory structures to load into context.\n")
                 elif key == 'log_file':
                     file.write("# Path to the log file where chat history is saved.\n")
-                elif key == 'model':
-                    file.write("# Model name to be used by the client.\n")
                 elif key == 'api_key_file':
                     file.write("# Path to the file containing the API key.\n")
                 elif key == 'user_message_file':
                     file.write("# Path to the file containing user messages.\n")
-                elif key == 'client':
-                    file.write("# Client type. Options are: openai, ollama, rbx.\n")
                 elif key == 'gateway_base_url':
                     file.write("# Base URL for the API gateway (used with rbx client).\n")
                 elif key == 'max_tokens':
@@ -101,8 +122,17 @@ def update_gitignore():
 
 def main():
     """Initialize the project environment for Attention Forge."""
+    check_ollama_installed()  # Check for Ollama before setting up the environment
     create_build_directory()
     create_or_update_yaml(CONTEXT_FILE, context_defaults, f"Initialized {CONTEXT_FILE} with default values.")
+
+    # Initialize ModelChecker and determine which model to use
+    model_checker = ModelChecker()
+    base_model = model_checker.select_base_model()
+
+    # Add the base model to project defaults under a new config key, e.g., `base_model`
+    project_defaults['base_model'] = base_model
+
     create_or_update_yaml(PROJECT_FILE, project_defaults, f"Initialized {PROJECT_FILE} with default values.")
     update_gitignore()
     print("🎉 Project is ready for Attention Forge!")

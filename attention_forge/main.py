@@ -6,16 +6,15 @@ from attention_forge.config_loader import load_project_config
 from attention_forge.context_loader import load_context
 from attention_forge.user_input_handler import get_user_message
 from attention_forge.file_manager import set_run_id
-from attention_forge.chain_steps.chat import Chat
-from attention_forge.chain_steps.chat_logger import ChatLogger
 from attention_forge.role import Role
+from attention_forge.chain import Chain
 
 def main():
     run_id = str(uuid.uuid4())
     set_run_id(run_id)
 
     project_config_path = sys.argv[1] if len(sys.argv) > 1 else "attention_forge_project.yaml"
-    role_name = sys.argv[2] if len(sys.argv) > 2 else "default"
+    chain_name = sys.argv[2] if len(sys.argv) > 2 else "general_dev"
 
     if not os.path.isfile(project_config_path):
         print(f"Error: Project config file '{project_config_path}' not found.")
@@ -26,31 +25,23 @@ def main():
         api_key_path = project_config.get("api_key_file", "api-key")
         user_message_file_path = project_config.get("user_message_file", "")
         api_key = load_api_key(api_key_path)
-        client = project_config.get("client", "openai")  # Load client from config
-        model = project_config.get("model", "")  # Load model from config
-        log_file = project_config.get("log_file", "chat_log.txt")  # Get log file name
+        context_files = load_context(api_key_path)
+        user_message = get_user_message(user_message_file_path)
     except Exception as e:
         print(f"Configuration error: {e}")
         sys.exit(1)
 
     print(f"🆔 Run ID: {run_id}")
 
-    user_message = get_user_message(user_message_file_path)
-    context_files = load_context(api_key_path)
-
-    # Initialize Role class and prepare role config
     role_handler = Role()
 
-    # Construct ChatLogger
-    chat_logger = ChatLogger(log_file)
-
-    # Initialize Chat class with role_name, role_handler, context_files, client, model, and chat_logger
-    chat = Chat(api_key, project_config, role_name, role_handler, context_files, user_message, client, model, chat_logger)
+    # Instantiate the Chain object with the new chain_name
+    chain = Chain(chain_name, api_key, role_handler, context_files, user_message)
 
     try:
-        chat.run()
+        chain.run()
     except Exception as e:
-        print("An error occurred while communicating with the client:", e)
+        print("An error occurred while executing the chain:", e)
 
 if __name__ == "__main__":
     main()

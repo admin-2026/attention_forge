@@ -10,7 +10,7 @@ setup(
     packages=find_packages(include=["attention_forge", "attention_forge.*", "attention_forge.clients"]),
     include_package_data=True,
     package_data={
-        "attention_forge": ["role_configs/*.yaml"]  # Include YAML configuration files
+        "attention_forge": ["role_configs/*.yaml", "chain_configs/*.yaml"]  # Include YAML configuration files
     },
     install_requires=[
         "openai>=1.0.0",

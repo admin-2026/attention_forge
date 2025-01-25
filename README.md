@@ -66,21 +66,16 @@ attention-forge-init
 
 ### Usage
 
-- Run the assistant with the default role:
+- Run the assistant with the default chain `general_dev`:
   ```bash
   make run
   ```
 
-- Run the assistant with the developer assistant role:
+- Run the assistant with a custom chain:
   ```bash
-  make dev
+  make run-chain CHAIN=<chain_name>
   ```
-
-- Run the assistant with a custom role:
-  ```bash
-  make run-role ROLE=<role_name>
-  ```
-
+ 
 - Revert files from the latest backup:
   ```bash
   make revert

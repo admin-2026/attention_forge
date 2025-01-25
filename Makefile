@@ -4,11 +4,8 @@ PYTHON = py
 # Define the default project config file
 PROJECT_CONFIG = attention_forge_project.yaml
 
-# Define the default role (used for `make run`)
-DEFAULT_ROLE = default
-
-# Define the developer assistant role (used for `make dev`)
-DEV_ROLE = developer
+# Define the developer assistant chain (used for `make run`)
+DEV_CHAIN = general_dev
 
 # Define the build directory
 BUILD_DIR = attention_forge_build
@@ -40,19 +37,19 @@ install:  ## Install Attention Forge as a local package
 uninstall:  ## Uninstall Attention Forge package
 	$(PYTHON) -m pip uninstall -y attention_forge
 
-# Run the main script with the developer assistant role
-run:  ## Run Attention Forge with the developer assistant role
+# Run the main script with the developer assistant chain
+run:  ## Run Attention Forge with the specified default chain
 	@$(CHECK_PROJECT_CONFIG)
-	$(PYTHON) attention_forge/main.py $(PROJECT_CONFIG) $(DEV_ROLE)
+	$(PYTHON) attention_forge/main.py $(PROJECT_CONFIG) $(DEV_CHAIN)
 
-# Run the script with a custom role
-run-role:  ## Run Attention Forge with a custom role (use ROLE=<role_name>)
+# Run the script with a custom chain
+run-chain:  ## Run Attention Forge with a custom chain (use CHAIN=<chain_name>)
 	@$(CHECK_PROJECT_CONFIG)
-	@if [ -z "$(ROLE)" ]; then \
-		echo "Error: Please specify a role using ROLE=<role_name>"; \
+	@if [ -z "$(CHAIN)" ]; then \
+		echo "Error: Please specify a chain using CHAIN=<chain_name>"; \
 		exit 1; \
 	fi
-	$(PYTHON) main.py $(PROJECT_CONFIG) $(ROLE)
+	$(PYTHON) main.py $(PROJECT_CONFIG) $(CHAIN)
 
 # Run the script to revert a file from the latest backup
 revert:  ## Revert a file from the latest backup

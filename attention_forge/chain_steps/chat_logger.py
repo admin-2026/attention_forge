@@ -3,7 +3,7 @@ import json
 import logging
 
 # Ensure build directory exists
-BUILD_DIR = "attention_forge_build/"
+BUILD_DIR = ".attention_forge/"
 if not os.path.exists(BUILD_DIR):
     os.makedirs(BUILD_DIR)
 

@@ -6,7 +6,7 @@ import glob
 
 from attention_forge.setup_tools.model_checker import ModelChecker  # Import the new ModelChecker
 
-BUILD_DIR = 'attention_forge_build'
+BUILD_DIR = '.attention_forge'
 CONTEXT_FILE = 'attention_forge_context.yaml'
 PROJECT_FILE = 'attention_forge_project.yaml'
 GITIGNORE_FILE = '.gitignore'
@@ -15,11 +15,11 @@ PLUGIN_FOLDER = os.path.join(os.path.dirname(__file__), 'plugins')
 context_defaults = {
     'include_paths': ['./src', './scripts'],
     'tree_paths': ['./'],
-    'ignore_paths': ['attention_forge_build/', './.git/', 'api-key']
+    'ignore_paths': ['.attention_forge/', './.git/', 'api-key']
 }
 
 project_defaults = {
-    'log_file': 'attention_forge_build/chat_history.log',
+    'log_file': '.attention_forge/chat_history.log',
     'model': 'gpt-4o',
     'api_key_file': 'api-key',
     'user_message_file': 'user_message.txt',
@@ -40,7 +40,7 @@ def check_ollama_installed():
         exit(1)
 
 def create_build_directory():
-    """Create the attention_forge_build directory if it doesn't exist."""
+    """Create the .attention_forge directory if it doesn't exist."""
     if not os.path.exists(BUILD_DIR):
         os.mkdir(BUILD_DIR)
         print(f"✅ Created directory: {BUILD_DIR}")

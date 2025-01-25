@@ -8,7 +8,7 @@ PROJECT_CONFIG = attention_forge_project.yaml
 DEV_CHAIN = general_dev
 
 # Define the build directory
-BUILD_DIR = attention_forge_build
+BUILD_DIR = .attention_forge
 
 # Detect OS (Windows vs Unix)
 OS := $(shell uname -s 2>/dev/null || echo Windows)

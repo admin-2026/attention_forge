@@ -3,7 +3,7 @@ import shutil
 import datetime
 import json
 
-BUILD_DIR = "attention_forge_build/"
+BUILD_DIR = ".attention_forge/"
 BACKUP_DIR = os.path.join(BUILD_DIR, "backup/")
 BACKUP_LOG = os.path.join(BUILD_DIR, "backup_log.json")
 

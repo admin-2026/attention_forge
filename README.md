@@ -100,7 +100,7 @@ attention-forge-init
 
 - `attention_forge/` - Main source code and modules.
 - `role_configs/` - Configuration files for different assistant roles.
-- `attention_forge_build/` - Directory for logs and backups.
+- `.attention_forge/` - Directory for logs and backups.
 
 ## Plugins
 

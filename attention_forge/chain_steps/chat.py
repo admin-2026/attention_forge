@@ -5,19 +5,17 @@ from attention_forge.clients.rbx_client import RBXClient
 from attention_forge.chain_steps.chat_logger import ChatLogger  # Import ChatLogger
 
 class Chat(Step):
-    def __init__(self, api_key, project_config, role_name, role_handler, context_files, user_message, client, model, chat_logger):
+    def __init__(self, api_key, project_config, role_name, role_handler, context_files, client, model, chat_logger):
         self.api_key = api_key
         self.project_config = project_config
         self.role_config = role_handler.initialize_role(role_name, context_files)
-        self.user_message = user_message
-        self.request_data = None
-        self.response_data = None
-        self.assistant_reply = None
         self.client = client
         self.model = model
-        self.chat_logger = chat_logger  # Use passed in ChatLogger
+        self.chat_logger = chat_logger
 
-    def run(self):
+    def run(self, user_message):
+        self.user_message = user_message
+
         if self.client == "ollama":
             self.request_data, self.response_data, self.assistant_reply = generate_ollama_response(
                 self.api_key, self.project_config, self.role_config, self.user_message
@@ -35,6 +33,8 @@ class Chat(Step):
         # Log chat and print results
         self.chat_logger.log_chat(self.request_data, self.response_data, self.client, self.model)
         self.print_results(self.model)
+
+        return self.response_data  # Output the response_data
 
     def print_results(self, model_name):
         client_name = self.project_config.get('client', 'openai')

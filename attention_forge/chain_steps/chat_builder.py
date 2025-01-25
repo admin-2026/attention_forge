@@ -9,7 +9,7 @@ class ChatBuilder:
         self.project_config = project_config
         self.chat_logger = ChatLogger(self.project_config.get("log_file", "chat_log.txt"))
 
-    def build(self, role_name, user_message, step_config):
+    def build(self, role_name, step_config):
         client = step_config.get("client", self.project_config.get("client", "openai"))
         model = step_config.get("model", self.project_config.get("model", ""))
 
@@ -19,7 +19,6 @@ class ChatBuilder:
             role_name,
             self.role_handler,
             self.context_files,
-            user_message,
             client,
             model,
             self.chat_logger

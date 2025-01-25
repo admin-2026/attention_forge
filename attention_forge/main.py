@@ -23,10 +23,8 @@ def main():
     try:
         project_config = load_project_config(project_config_path)
         api_key_path = project_config.get("api_key_file", "api-key")
-        user_message_file_path = project_config.get("user_message_file", "")
         api_key = load_api_key(api_key_path)
         context_files = load_context(api_key_path)
-        user_message = get_user_message(user_message_file_path)
     except Exception as e:
         print(f"Configuration error: {e}")
         sys.exit(1)
@@ -35,8 +33,8 @@ def main():
 
     role_handler = Role()
 
-    # Instantiate the Chain object with the new chain_name
-    chain = Chain(chain_name, api_key, role_handler, context_files, user_message)
+    # Instantiate the Chain object
+    chain = Chain(chain_name, api_key, role_handler, context_files, project_config)
 
     try:
         chain.run()

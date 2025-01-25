@@ -1,2 +1,4 @@
 steps:
+    - type: user_input
+      source: stdin|file
     - type: chat

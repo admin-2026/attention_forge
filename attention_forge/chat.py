@@ -3,10 +3,13 @@ from attention_forge.clients.ollama_client import generate_ollama_response
 from attention_forge.clients.rbx_client import RBXClient
 
 class Chat:
-    def __init__(self, api_key, project_config, role_config, user_message):
+    def __init__(self, api_key, project_config, role_name, role_handler, context_files, user_message):
         self.api_key = api_key
         self.project_config = project_config
-        self.role_config = role_config
+
+        # Use role_handler to initialize the role configuration
+        self.role_config = role_handler.initialize_role(role_name, context_files)
+
         self.user_message = user_message
         self.request_data = None
         self.response_data = None

@@ -2,12 +2,13 @@ import sys
 import os
 import uuid
 from attention_forge.api_key_loader import load_api_key
-from attention_forge.config_loader import load_project_config, load_role_config
+from attention_forge.config_loader import load_project_config
 from attention_forge.context_loader import load_context
 from attention_forge.chat_logger import log_chat
 from attention_forge.user_input_handler import get_user_message
 from attention_forge.file_manager import set_run_id
-from attention_forge.chat import Chat  # Import the new Chat class
+from attention_forge.chat import Chat
+from attention_forge.role import Role  # Import Role
 
 def main():
     run_id = str(uuid.uuid4())
@@ -22,7 +23,6 @@ def main():
 
     try:
         project_config = load_project_config(project_config_path)
-        role_config = load_role_config(role_name)
         api_key_path = project_config.get("api_key_file", "api-key")
         user_message_file_path = project_config.get("user_message_file", "")
         api_key = load_api_key(api_key_path)
@@ -35,13 +35,12 @@ def main():
 
     user_message = get_user_message(user_message_file_path)
     context_files = load_context(api_key_path)
-    context_text = "\n".join(content for content in context_files.values()) if context_files else ""
 
-    if context_text:
-        role_config["developer_message"] += f"\n\nHere are some relevant code files:\n\n{context_text}"
+    # Initialize Role class and prepare role config
+    role_handler = Role()
 
-    # Create and run a Chat object
-    chat = Chat(api_key, project_config, role_config, user_message)
+    # Initialize Chat class with role_name, role_handler, and context_files
+    chat = Chat(api_key, project_config, role_name, role_handler, context_files, user_message)
 
     try:
         chat.run()

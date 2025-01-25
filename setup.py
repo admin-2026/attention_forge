@@ -3,8 +3,6 @@ from setuptools import setup, find_packages
 setup(
     name="attention_forge",
     version="0.1.0",
-    author="Your Name",
-    author_email="your.email@example.com",
     description="A tool for AI-assisted coding with automated file updates and backups.",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
@@ -16,12 +14,8 @@ setup(
     },
     install_requires=[
         "openai>=1.0.0",
-        "pyyaml"
-    ],
-    classifiers=[
-        "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
+        "pyyaml",
+        "ollama>=0.4.7",
     ],
     python_requires=">=3.8",
 )

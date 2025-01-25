@@ -1,5 +1,5 @@
 from ollama import chat, ChatResponse
-from attention_forge.message_constructor import construct_messages
+from attention_forge.clients.message_constructor import construct_messages
 
 def generate_ollama_response(api_key, project_config, role_config, user_message):
     """Generate a response from Ollama using the ossama library."""

@@ -6,9 +6,9 @@ from attention_forge.config_loader import load_project_config
 from attention_forge.context_loader import load_context
 from attention_forge.user_input_handler import get_user_message
 from attention_forge.file_manager import set_run_id
-from attention_forge.chat import Chat
+from attention_forge.chain_steps.chat import Chat
+from attention_forge.chain_steps.chat_logger import ChatLogger
 from attention_forge.role import Role
-from attention_forge.chat_logger import ChatLogger  # Import ChatLogger
 
 def main():
     run_id = str(uuid.uuid4())

@@ -1,6 +1,6 @@
 import requests
 import json
-from attention_forge.message_constructor import construct_messages
+from attention_forge.clients.message_constructor import construct_messages
 
 class RBXClient:
 

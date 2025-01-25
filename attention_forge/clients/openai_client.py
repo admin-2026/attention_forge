@@ -1,5 +1,5 @@
 import openai
-from attention_forge.message_constructor import construct_messages
+from attention_forge.clients.message_constructor import construct_messages
 
 def create_openai_client(api_key):
     """Create an OpenAI client instance with the provided API key."""

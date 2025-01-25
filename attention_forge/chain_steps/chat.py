@@ -1,8 +1,8 @@
-from attention_forge.step import Step
+from attention_forge.chain_steps.step import Step
 from attention_forge.clients.openai_client import generate_response as openai_generate_response
 from attention_forge.clients.ollama_client import generate_ollama_response
 from attention_forge.clients.rbx_client import RBXClient
-from attention_forge.chat_logger import ChatLogger  # Import ChatLogger
+from attention_forge.chain_steps.chat_logger import ChatLogger  # Import ChatLogger
 
 class Chat(Step):
     def __init__(self, api_key, project_config, role_name, role_handler, context_files, user_message, client, model, chat_logger):

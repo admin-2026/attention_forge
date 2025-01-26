@@ -6,5 +6,11 @@ steps:
       role_name: developer
       input_data_key: user_message
       output_data_key: chat_response
-    - type: file_update
+    - type: dictionary_rewrite
+      queries:
+        - from: .response
+          to: .
       input_data_key: chat_response
+      output_data_key: extracted_chat_response
+    - type: file_update
+      input_data_key: extracted_chat_response

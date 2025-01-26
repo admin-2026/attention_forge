@@ -5,7 +5,7 @@ from attention_forge.file_manager import update_file
 class FileUpdater(Step):
     def run(self, response_text):
         """Parses response text and updates extracted files."""
-        extracted_files = self.extract_code_blocks(response_text["response"])
+        extracted_files = self.extract_code_blocks(response_text)
 
         if not extracted_files:
             print("⚠️ No file updates detected in the response.")

@@ -3,6 +3,7 @@ import yaml
 from attention_forge.chain_steps.chat_builder import ChatBuilder
 from attention_forge.chain_steps.user_input_handler import UserInputHandler
 from attention_forge.chain_steps.file_updater import FileUpdater
+from attention_forge.chain_steps.dictionary_rewriter import DictionaryRewriter  # Import the new class
 
 class Chain:
     def __init__(self, chain_name, api_key, role_handler, context_files, project_config):
@@ -43,6 +44,10 @@ class Chain:
             elif step_type == "file_update":
                 file_updater = FileUpdater()
                 objects.append((file_updater, step))
+            elif step_type == "dictionary_rewrite":
+                query = step.get("queries", {})
+                dictionary_rewriter = DictionaryRewriter(query)
+                objects.append((dictionary_rewriter, step))
             else:
                 print(f"Unsupported step type: {step_type}")
 

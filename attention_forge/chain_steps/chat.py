@@ -2,7 +2,8 @@ from attention_forge.chain_steps.step import Step
 from attention_forge.clients.openai_client import generate_response as openai_generate_response
 from attention_forge.clients.ollama_client import generate_ollama_response
 from attention_forge.clients.rbx_client import RBXClient
-from attention_forge.chain_steps.chat_logger import ChatLogger  # Import ChatLogger
+from attention_forge.clients.deepseek_client import generate_deepseek_response  # Import the DeepSeek client
+from attention_forge.chain_steps.chat_logger import ChatLogger
 
 class Chat(Step):
     def __init__(self, api_key, project_config, role_name, role_handler, context_files, client, model, chat_logger):
@@ -25,6 +26,10 @@ class Chat(Step):
             self.request_data, self.response_data, self.assistant_reply = rbx_client.generate_response(
                 self.model, self.project_config, self.role_config, self.user_message
             )
+        elif self.client == "deepseek":
+            self.request_data, self.response_data, self.assistant_reply = generate_deepseek_response(
+                self.api_key, self.model, self.role_config, self.user_message
+            )
         else:
             self.request_data, self.response_data, self.assistant_reply = openai_generate_response(
                 self.api_key, self.model, self.role_config, self.user_message
@@ -34,7 +39,7 @@ class Chat(Step):
         self.chat_logger.log_chat(self.request_data, self.response_data, self.client, self.model)
         self.print_results(self.model)
 
-        return self.response_data  # Output the response_data
+        return self.response_data
 
     def print_results(self, model_name):
         client_name = self.project_config.get('client', 'openai')

@@ -4,7 +4,6 @@ import uuid
 from attention_forge.api_key_loader import load_api_key
 from attention_forge.config_loader import load_project_config
 from attention_forge.context_loader import ContextLoader  # Import ContextLoader class
-from attention_forge.user_input_handler import get_user_message
 from attention_forge.file_manager import set_run_id
 from attention_forge.role import Role
 from attention_forge.chain import Chain

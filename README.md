@@ -27,6 +27,10 @@ Attention Forge supports multiple AI clients, each with unique capabilities:
 - **Usage**:
   RBX is another supported client, where you specify `client: "rbx"` in the configuration. The RBX client uses custom API endpoints, defined in `gateway_base_url`, to request specific model responses. Ensure `max_tokens` and `model` are set as required.
 
+### DeepSeek
+- **Usage**:
+  DeepSeek is a newly supported client for advanced conversational AI capabilities. Set `client: "deepseek"` in the configuration. Ensure your API key is correctly positioned in the `api-key` file, and other necessary configurations such as `model` are properly set in `attention_forge_project.yaml`.
+
 ## Getting Started
 
 ### Prerequisites

@@ -40,16 +40,20 @@ uninstall:  ## Uninstall Attention Forge package
 # Run the main script with the developer assistant chain
 run:  ## Run Attention Forge with the specified default chain
 	@$(CHECK_PROJECT_CONFIG)
-	$(PYTHON) attention_forge/main.py $(PROJECT_CONFIG) $(DEV_CHAIN)
+	$(PYTHON) attention_forge/main.py $(DEV_CHAIN) $(PROJECT_CONFIG)
 
 # Run the script with a custom chain
-run-chain:  ## Run Attention Forge with a custom chain (use CHAIN=<chain_name>)
+run-chain:  ## Run Attention Forge with a custom chain (use CHAIN=<chain_name> CONFIG=<config_path>)
 	@$(CHECK_PROJECT_CONFIG)
 	@if [ -z "$(CHAIN)" ]; then \
 		echo "Error: Please specify a chain using CHAIN=<chain_name>"; \
 		exit 1; \
 	fi
-	$(PYTHON) main.py $(PROJECT_CONFIG) $(CHAIN)
+	@if [ -z "$(CONFIG)" ]; then \
+		echo "Error: Please specify a config using CONFIG=<config_path>"; \
+		exit 1; \
+	fi
+	$(PYTHON) attention_forge/main.py $(CHAIN) $(CONFIG)
 
 # Run the script to revert a file from the latest backup
 revert:  ## Revert a file from the latest backup

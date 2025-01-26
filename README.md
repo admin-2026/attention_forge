@@ -71,11 +71,11 @@ attention-forge-init
   make run
   ```
 
-- Run the assistant with a custom chain:
+- Run the assistant with a custom chain and specify the project configuration (order: chain_name, config_path):
   ```bash
-  make run-chain CHAIN=<chain_name>
+  make run-chain CHAIN=<chain_name> CONFIG=<config_path>
   ```
- 
+
 - Revert files from the latest backup:
   ```bash
   make revert

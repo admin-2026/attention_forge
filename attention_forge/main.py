@@ -13,8 +13,9 @@ def main():
     run_id = str(uuid.uuid4())
     set_run_id(run_id)
 
-    project_config_path = sys.argv[1] if len(sys.argv) > 1 else "attention_forge_project.yaml"
-    chain_name = sys.argv[2] if len(sys.argv) > 2 else "general_dev"
+    # Swap the order of chain_name and project_config_path
+    chain_name = sys.argv[1] if len(sys.argv) > 1 else "general_dev"
+    project_config_path = sys.argv[2] if len(sys.argv) > 2 else "attention_forge_project.yaml"
 
     if not os.path.isfile(project_config_path):
         print(f"Error: Project config file '{project_config_path}' not found.")

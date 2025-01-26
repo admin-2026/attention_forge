@@ -72,6 +72,12 @@ def backup_file(file_path):
 
 def update_file(file_path, new_content):
     """Update a file with new content after backing it up."""
+    # Ensure the directory exists
+    directory = os.path.dirname(file_path)
+    if directory and not os.path.exists(directory):
+        os.makedirs(directory)
+        print(f"📁 Created directories for: {directory}")
+
     backup_file(file_path)
     try:
         with open(file_path, "w", encoding="utf-8") as file:
@@ -79,4 +85,3 @@ def update_file(file_path, new_content):
         print(f"✅ Updated file: {file_path}")
     except Exception as e:
         print(f"🚨 Error updating file '{file_path}': {e}")
-

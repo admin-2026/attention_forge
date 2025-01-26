@@ -15,9 +15,9 @@ OS := $(shell uname -s 2>/dev/null || echo Windows)
 
 # Check if the project config file exists (Cross-Platform)
 ifeq ($(OS), Windows)
-    CHECK_PROJECT_CONFIG = if not exist $(PROJECT_CONFIG) ( echo Error: '$(PROJECT_CONFIG)' file not found. Please create the file or specify a valid path. && exit /b 1 )
+	CHECK_PROJECT_CONFIG = if not exist $(PROJECT_CONFIG) ( echo Error: '$(PROJECT_CONFIG)' file not found. Please create the file or specify a valid path. && exit /b 1 )
 else
-    CHECK_PROJECT_CONFIG = if [ ! -f $(PROJECT_CONFIG) ]; then echo "Error: '$(PROJECT_CONFIG)' file not found."; exit 1; fi
+	CHECK_PROJECT_CONFIG = if [ ! -f $(PROJECT_CONFIG) ]; then echo "Error: '$(PROJECT_CONFIG)' file not found."; exit 1; fi
 endif
 
 # Install dependencies
@@ -80,6 +80,10 @@ else
 	@find . -type d -name "__pycache__" -exec rm -rf {} +
 endif
 
+# Run unit tests
+test: ## Run unit tests
+	$(PYTHON) -m unittest discover -p "*_test.py"
+
 # Display help
 help:
 	@echo ""
@@ -93,5 +97,6 @@ help:
 	@echo "  revert               - Revert a file from the latest backup"
 	@echo "  format               - Format code using black"
 	@echo "  clean                - Remove cache files, logs, and backups"
+	@echo "  test                 - Run unit tests"
 	@echo "  help                 - Show available commands"
 	@echo ""

@@ -2,6 +2,7 @@ import os
 import yaml
 from attention_forge.chain_steps.chat_builder import ChatBuilder
 from attention_forge.chain_steps.user_input_handler import UserInputHandler
+from attention_forge.chain_steps.file_updater import FileUpdater
 
 class Chain:
     def __init__(self, chain_name, api_key, role_handler, context_files, project_config):
@@ -39,6 +40,9 @@ class Chain:
                     step
                 )
                 objects.append((chat_object, step))
+            elif step_type == "file_update":
+                file_updater = FileUpdater()
+                objects.append((file_updater, step))
             else:
                 print(f"Unsupported step type: {step_type}")
 
@@ -46,21 +50,16 @@ class Chain:
 
     def run(self):
         step_data = {}  # Store outputs of steps
-        for obj, step in self.objects_list:
-            input_data_key = step.get('input_data_key')
-            output_data_key = step.get('output_data_key')
 
-            # Determine input to pass to this step
+        for obj, step in self.objects_list:
+            # Fetch the input data for the step if an input key is specified
+            input_data_key = step.get('input_data_key')
             input_value = step_data.get(input_data_key) if input_data_key else None
 
-            if isinstance(obj, UserInputHandler):
-                user_message = obj.run()
-                # Store output if output_data_key is provided
-                if output_data_key:
-                    step_data[output_data_key] = user_message
-            else:
-                # Use input value for the Chat object's run method
-                response_data = obj.run(input_value)
-                # Store output if output_data_key is provided
-                if output_data_key:
-                    step_data[output_data_key] = response_data
+            # Run the step with the input value, and capture the output
+            output_data = obj.run(input_value)
+
+            # Store the output in step_data if an output key is specified
+            output_data_key = step.get('output_data_key')
+            if output_data_key:
+                step_data[output_data_key] = output_data

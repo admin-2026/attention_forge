@@ -5,3 +5,6 @@ steps:
     - type: chat
       role_name: developer
       input_data_key: user_message
+      output_data_key: chat_response
+    - type: file_update
+      input_data_key: chat_response

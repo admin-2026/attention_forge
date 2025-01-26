@@ -54,6 +54,42 @@ Use the `attention-forge-init` command to initialize a new project environment w
 attention-forge-init
 ```
 
+### Interaction
+
+To start interacte with the LLM, type:
+
+```bash
+attention-forge <chain name, default to general_dev>
+```
+
+or
+
+```bash
+afg <chain name, default to general_dev>
+```
+
+Say hello to the LLM.
+
+## Chains
+
+Chains allow you to execute predefined sequences of operations that can involve user input, interactions with AI models, and file management tasks. Here are the currently available chains:
+
+### General Development (`afg general_dev`, default chain, just `afg`)
+This chain is designed for development tasks where interactions involve reading user input, consulting an AI model to process the input, and updating files as per the model's suggestions. The chain includes steps to:
+- Capture user input via standard input or a specified file.
+- Initiate a chat with AI models configured for development interactions.
+- Extract responses to update files in the project as needed.
+
+### Revert (`afg revert`)
+Designed to manage and revert file updates. This chain focuses on:
+- Reverting files to their previous states based on backup logs.
+- Presenting user choices for which files to revert, ensuring flexibility and safety in file management.
+
+### Chat (`afg chat`)
+This chain provides a streamlined chat interface with an AI model focusing on conversational purposes. It includes:
+- Capturing user input.
+- Maintaining chats with AI models written as per configuration.
+
 ### Configuration
 
 1. **API Key**:
@@ -68,7 +104,7 @@ attention-forge-init
 4. **Context Configuration**:
    - Specify files or directories to include/exclude in the context in `attention_forge_context.yaml`.
 
-### Usage
+## Developement
 
 - Run the assistant with the default chain `general_dev`:
   ```bash

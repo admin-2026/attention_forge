@@ -18,16 +18,16 @@ class Chat(Step):
 
         if self.client == "ollama":
             self.request_data, self.response_data, self.assistant_reply = generate_ollama_response(
-                self.api_key, self.project_config, self.role_config, self.user_message
+                self.api_key, self.model, self.role_config, self.user_message
             )
         elif self.client == "rbx":
             rbx_client = RBXClient(self.api_key)
             self.request_data, self.response_data, self.assistant_reply = rbx_client.generate_response(
-                self.project_config, self.role_config, self.user_message
+                self.model, self.project_config, self.role_config, self.user_message
             )
         else:
             self.request_data, self.response_data, self.assistant_reply = openai_generate_response(
-                self.api_key, self.project_config, self.role_config, self.user_message
+                self.api_key, self.model, self.role_config, self.user_message
             )
 
         # Log chat and print results

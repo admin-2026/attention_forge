@@ -5,10 +5,8 @@ def create_openai_client(api_key):
     """Create an OpenAI client instance with the provided API key."""
     return openai.Client(api_key=api_key)
 
-def generate_response(api_key, project_config, role_config, user_message):
+def generate_response(api_key, model, role_config, user_message):
     """Generate a response from OpenAI using the latest API format."""
-    model = project_config.get("model", "gpt-4-turbo")
-
     client = create_openai_client(api_key)  # Initialize client with API key
 
     messages = construct_messages(role_config, user_message)

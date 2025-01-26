@@ -20,18 +20,18 @@ else
     CHECK_PROJECT_CONFIG = if [ ! -f $(PROJECT_CONFIG) ]; then echo "Error: '$(PROJECT_CONFIG)' file not found."; exit 1; fi
 endif
 
-# Generate requirements.txt from installed packages
-requirements:
-	pip freeze > requirements.txt
-
 # Install dependencies
 install-dependencies:  ## Install required dependencies
 	$(PYTHON) -m pip install --upgrade pip
-	$(PYTHON) -m pip install -r requirements.txt || $(PYTHON) -m pip install openai pyyaml
+	$(PYTHON) -m pip install -r requirements.txt
 
 # Install Attention Forge as a local package
-install:  ## Install Attention Forge as a local package
+install: install-dependencies ## Install Attention Forge as a local package
 	$(PYTHON) -m pip install .
+
+# Install Attention Forge in development mode
+dev-install:  ## Install Attention Forge in development mode
+	$(PYTHON) -m pip install -e .
 
 # Uninstall Attention Forge
 uninstall:  ## Uninstall Attention Forge package
@@ -86,6 +86,7 @@ help:
 	@echo "Available Makefile commands:"
 	@echo "  install              - Install required dependencies"
 	@echo "  install-package      - Install Attention Forge as a local package"
+	@echo "  dev-install          - Install Attention Forge in development mode"
 	@echo "  uninstall            - Uninstall Attention Forge package"
 	@echo "  run                  - Run Attention Forge with the developer assistant role"
 	@echo "  run-role ROLE=<role> - Run Attention Forge with a custom role"

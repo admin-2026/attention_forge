@@ -10,16 +10,12 @@ class RBXClient:
             "Content-Type": "application/json"
         }
 
-    def generate_response(self, project_config, role_config, user_message):
+    def generate_response(self, model_name, project_config, role_config, user_message):
         """Generate a response from RBX using the specific APIs."""
         # Load necessary configuration
         gateway_base_url = project_config.get("gateway_base_url")
         if not gateway_base_url:
             raise ValueError("Gateway base URL not found in project configuration.")
-
-        model_name = project_config.get("model")
-        if not model_name:
-            raise ValueError("Model name not found in project configuration.")
 
         max_tokens = project_config.get("max_tokens")
         if max_tokens is None:

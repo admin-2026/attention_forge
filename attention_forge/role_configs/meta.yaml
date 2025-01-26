@@ -1,3 +1,4 @@
 roles:
   default: "assistant.yaml"
   developer: "dev_assistant.yaml"
+  file_update_recognize: "file_update_recognizer.yaml"

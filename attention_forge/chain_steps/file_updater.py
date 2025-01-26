@@ -29,7 +29,7 @@ class FileUpdater(Step):
         ```
         """
         # Updated regex pattern: Extracts filenames inside backticks (`file.ext`)
-        pattern = r"###\s*`(.+?)`\s*\n```(\w+)?\n(.*?)\n```"
+        pattern = r"<`(.+?)`>\s*\n```(\w+)?\n(.*?)\n```"
 
         matches = re.findall(pattern, response_text, re.DOTALL)
 

@@ -47,7 +47,7 @@ class ContextLoader:
 
             # Skip ignored directories
             if self.is_path_ignored(dirpath, ignore_paths):
-                print(f"❌ Skipping tree generation of ignored directory: {dirpath}")
+                print(f"⏩ Skipping tree generation of ignored directory: {dirpath}")
                 dirnames[:] = []  # Skip processing subdirectories in ignored path
                 continue
 
@@ -66,7 +66,7 @@ class ContextLoader:
 
         # Check if the entire directory is ignored
         if self.is_path_ignored(directory, ignore_paths):
-            print(f"❌ Skipping traversal of ignored directory: {directory}")
+            print(f"⏩ Skipping traversal of ignored directory: {directory}")
             return []
 
         print(f"📂 Scanning directory: {directory}")
@@ -77,7 +77,7 @@ class ContextLoader:
 
             # Check if the current directory (or any of its parent paths) is in the ignore list
             if self.is_path_ignored(root, ignore_paths):
-                print(f"❌ Skipping traversal of ignored directory: {root}")
+                print(f"⏩ Skipping traversal of ignored directory: {root}")
                 dirs[:] = []  # Modify dirs in-place to prevent descending into ignored directories
                 continue
 

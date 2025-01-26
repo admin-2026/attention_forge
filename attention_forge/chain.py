@@ -3,7 +3,8 @@ import yaml
 from attention_forge.chain_steps.chat_builder import ChatBuilder
 from attention_forge.chain_steps.user_input_handler import UserInputHandler
 from attention_forge.chain_steps.file_updater import FileUpdater
-from attention_forge.chain_steps.dictionary_rewriter import DictionaryRewriter  # Import the new class
+from attention_forge.chain_steps.dictionary_rewriter import DictionaryRewriter
+from attention_forge.chain_steps.file_reverter import FileReverter
 
 class Chain:
     def __init__(self, chain_name, api_key, role_handler, context_files, project_config):
@@ -48,23 +49,23 @@ class Chain:
                 query = step.get("queries", {})
                 dictionary_rewriter = DictionaryRewriter(query)
                 objects.append((dictionary_rewriter, step))
+            elif step_type == "revert":
+                file_reverter = FileReverter()
+                objects.append((file_reverter, step))
             else:
                 print(f"Unsupported step type: {step_type}")
 
         return objects
 
     def run(self):
-        step_data = {}  # Store outputs of steps
+        step_data = {}
 
         for obj, step in self.objects_list:
-            # Fetch the input data for the step if an input key is specified
             input_data_key = step.get('input_data_key')
             input_value = step_data.get(input_data_key) if input_data_key else None
 
-            # Run the step with the input value, and capture the output
             output_data = obj.run(input_value)
 
-            # Store the output in step_data if an output key is specified
             output_data_key = step.get('output_data_key')
             if output_data_key:
                 step_data[output_data_key] = output_data

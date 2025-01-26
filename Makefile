@@ -56,9 +56,9 @@ run-chain:  ## Run Attention Forge with a custom chain (use CHAIN=<chain_name> C
 	$(PYTHON) attention_forge/main.py $(CHAIN) $(CONFIG)
 
 # Run the script to revert a file from the latest backup
-revert:  ## Revert a file from the latest backup
+revert:  ## Revert a file using the revert chain
 	@$(CHECK_PROJECT_CONFIG)
-	$(PYTHON) main.py revert
+	$(PYTHON) attention_forge/main.py revert $(PROJECT_CONFIG)
 
 # Check Python formatting with black
 format:  ## Format code using black

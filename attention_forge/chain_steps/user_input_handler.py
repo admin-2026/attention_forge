@@ -2,7 +2,7 @@ from attention_forge.chain_steps.step import Step
 import os
 
 class UserInputHandler(Step):
-    def __init__(self, source='stdin', project_config=None):  # Accept project_config
+    def __init__(self, source='stdin', project_config=None):
         self.source = source
         self.user_message_file = project_config.get("user_message_file", "user_message.txt") if project_config else "user_message.txt"
 
@@ -20,13 +20,9 @@ class UserInputHandler(Step):
         if not user_message and 'stdin' in self.source:
             user_message = input("Enter your message: ").strip()
 
-        if not user_message or user_message.lower() in ["exit", "revert"]:
+        if not user_message or user_message.lower() == "exit":
             if user_message.lower() == "exit":
                 print("Exiting the program. No request sent to OpenAI.")
-                exit(0)
-            elif user_message.lower() == "revert":
-                from attention_forge.file_manager import revert_file
-                revert_file()
                 exit(0)
 
         return user_message

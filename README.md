@@ -80,7 +80,7 @@ attention-forge-init
   make run-chain CHAIN=<chain_name> CONFIG=<config_path>
   ```
 
-- Revert files from the latest backup:
+- Revert files using the revert chain configuration:
   ```bash
   make revert
   ```
@@ -98,7 +98,7 @@ attention-forge-init
 ### Example Commands
 
 - Enter your query or command when prompted by `main.py`.
-- Use "exit" to quit the application or "revert" to restore a file from the latest backup.
+- Use "exit" to quit the application.
 
 ## Directory Structure
 

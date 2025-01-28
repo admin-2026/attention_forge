@@ -14,25 +14,26 @@ class Chat(Step):
         self.model = model
         self.chat_logger = chat_logger
 
-    def run(self, user_message):
-        self.user_message = user_message
+    def run(self, *user_messages):
+        # Combine user messages if needed
+        user_message = ' '.join(user_messages)
 
         if self.client == "ollama":
             self.request_data, self.response_data, self.assistant_reply = generate_ollama_response(
-                self.api_key, self.model, self.role_config, self.user_message
+                self.api_key, self.model, self.role_config, user_message
             )
         elif self.client == "rbx":
             rbx_client = RBXClient(self.api_key)
             self.request_data, self.response_data, self.assistant_reply = rbx_client.generate_response(
-                self.model, self.project_config, self.role_config, self.user_message
+                self.model, self.project_config, self.role_config, user_message
             )
         elif self.client == "deepseek":
             self.request_data, self.response_data, self.assistant_reply = generate_deepseek_response(
-                self.api_key, self.model, self.role_config, self.user_message
+                self.api_key, self.model, self.role_config, user_message
             )
         else:
             self.request_data, self.response_data, self.assistant_reply = openai_generate_response(
-                self.api_key, self.model, self.role_config, self.user_message
+                self.api_key, self.model, self.role_config, user_message
             )
 
         # Log chat and print results

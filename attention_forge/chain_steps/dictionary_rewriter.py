@@ -4,8 +4,9 @@ class DictionaryRewriter(Step):
     def __init__(self, query):
         self.query = query
 
-    def run(self, input_data=None):
-        result = self.apply_query(input_data)
+    def run(self, *input_data):
+        input_dictionary = input_data[0] if input_data else {}
+        result = self.apply_query(input_dictionary)
         return result
 
     def apply_query(self, input_data):

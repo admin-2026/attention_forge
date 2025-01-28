@@ -6,7 +6,7 @@ class UserInputHandler(Step):
         self.source = source
         self.user_message_file = project_config.get("user_message_file", "user_message.txt") if project_config else "user_message.txt"
 
-    def run(self, previous_msg):
+    def run(self, *previous_msg):
         user_message = None
         if 'file' in self.source and os.path.isfile(self.user_message_file):
             with open(self.user_message_file, "r", encoding="utf-8") as file:

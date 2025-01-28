@@ -3,9 +3,10 @@ from attention_forge.chain_steps.step import Step
 from attention_forge.file_manager import update_file
 
 class FileUpdater(Step):
-    def run(self, response_text):
+    def run(self, *response_texts):
         """Parses response text and updates extracted files."""
-        extracted_files = self.extract_code_blocks(response_text)
+        combined_text = ' '.join(response_texts)
+        extracted_files = self.extract_code_blocks(combined_text)
 
         if not extracted_files:
             print("⚠️ No file updates detected in the response.")

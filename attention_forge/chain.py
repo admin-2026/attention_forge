@@ -62,9 +62,16 @@ class Chain:
 
         for obj, step in self.objects_list:
             input_data_key = step.get('input_data_key')
-            input_value = step_data.get(input_data_key) if input_data_key else None
 
-            output_data = obj.run(input_value)
+            # If input_data_key is a list, gather all related data
+            input_values = []
+            if isinstance(input_data_key, list):
+                input_values = [step_data.get(key) for key in input_data_key]
+            else:
+                input_values = [step_data.get(input_data_key)] if input_data_key else []
+
+            # Run the step with gathered input values
+            output_data = obj.run(*input_values)
 
             output_data_key = step.get('output_data_key')
             if output_data_key:

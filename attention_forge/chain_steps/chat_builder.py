@@ -3,10 +3,9 @@ from attention_forge.chain_steps.chat_logger import ChatLogger
 import sys
 
 class ChatBuilder:
-    def __init__(self, api_key, role_handler, context_files, project_config):
+    def __init__(self, api_key, role_handler, project_config):
         self.api_key = api_key
         self.role_handler = role_handler
-        self.context_files = context_files
         self.project_config = project_config
         self.chat_logger = ChatLogger(self.project_config.get("log_file", "chat_log.txt"))
 
@@ -36,7 +35,6 @@ class ChatBuilder:
             self.project_config,
             role_name,
             self.role_handler,
-            self.context_files,
             client,
             model,
             self.chat_logger

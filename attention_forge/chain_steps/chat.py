@@ -6,18 +6,33 @@ from attention_forge.clients.deepseek_client import generate_deepseek_response  
 from attention_forge.chain_steps.chat_logger import ChatLogger
 
 class Chat(Step):
-    def __init__(self, api_key, project_config, role_name, role_handler, context_files, client, model, chat_logger):
+    def __init__(self, api_key, project_config, role_name, role_handler, client, model, chat_logger):
         self.api_key = api_key
         self.project_config = project_config
-        self.role_config = role_handler.initialize_role(role_name, context_files)
+        self.role_config = None  # Initialize as None
+        self.role_name = role_name
+        self.role_handler = role_handler
         self.client = client
         self.model = model
         self.chat_logger = chat_logger
 
-    def run(self, *user_messages):
-        # Combine user messages if needed
-        user_message = ' '.join(user_messages)
+    def run(self, *args):
+        # Unpack the arguments
+        user_message = args[0]
+        context_files = args[1] if len(args) > 1 else []
 
+        # Combine user messages into a single string if it's a list or tuple
+        if isinstance(user_message, (list, tuple)):
+            user_message = ' '.join(user_message)
+
+        # Initialize context_files if it's None
+        if context_files is None:
+            context_files = []
+
+        # Initialize the role configuration during the run
+        self.role_config = self.role_handler.initialize_role(self.role_name, context_files)
+
+        # Selecting the appropriate client to generate a response
         if self.client == "ollama":
             self.request_data, self.response_data, self.assistant_reply = generate_ollama_response(
                 self.api_key, self.model, self.role_config, user_message

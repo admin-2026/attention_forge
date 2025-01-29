@@ -4,8 +4,6 @@ import yaml
 import importlib.util
 import glob
 
-from attention_forge.setup_tools.model_checker import ModelChecker
-
 BUILD_DIR = '.attention_forge'
 CONTEXT_FILE = 'attention_forge_context.yaml'
 PROJECT_FILE = 'attention_forge_project.yaml'

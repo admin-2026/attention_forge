@@ -35,6 +35,7 @@ dev-install:  ## Install Attention Forge in development mode
 
 # Uninstall Attention Forge
 uninstall:  ## Uninstall Attention Forge package
+	$(PYTHON) setup.py clean --all
 	$(PYTHON) -m pip uninstall -y attention_forge
 
 # Run the main script with the developer assistant chain

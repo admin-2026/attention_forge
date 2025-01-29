@@ -1,6 +1,0 @@
-roles:
-  default: "assistant.yaml"
-  developer: "developer.yaml"
-  file_update_recognizer: "file_update_recognizer.yaml"
-  assistant: "assistant.yaml"
-  booster: "booster.yaml" # not released yet. Require strong reasoning model like deepseek-r1

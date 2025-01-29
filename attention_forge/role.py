@@ -1,32 +1,30 @@
 import yaml
-import pkg_resources
+import importlib.resources as pkg_resources
+import os
 
 class Role:
     def __init__(self):
-        # Load the meta configuration file at construction.
-        self.meta_config = self.load_meta_config()
+        # Initialize role configs by scanning the role_configs directory
         self.role_configs = {}
         self.preload_role_configs()
 
-    def load_meta_config(self):
-        try:
-            # Load the meta.yaml file from the package data
-            meta_data = pkg_resources.resource_string(__name__, "role_configs/meta.yaml")
-            return yaml.safe_load(meta_data)
-        except FileNotFoundError:
-            raise FileNotFoundError("Meta configuration file not found.")
-        except yaml.YAMLError as e:
-            raise Exception(f"Error parsing meta configuration: {e}")
-
     def preload_role_configs(self):
-        # Retrieve and load all role config files specified in meta.yaml
-        for role_name, config_file in self.meta_config["roles"].items():
-            config_data = pkg_resources.resource_string(__name__, f"role_configs/{config_file}")
-            self.role_configs[role_name] = yaml.safe_load(config_data)
+        # Directory path for role_configs
+        role_configs_dir = pkg_resources.files(__package__).joinpath("role_configs")
+        
+        # Iterate over all YAML files in the role_configs directory
+        for file in os.listdir(role_configs_dir):
+            if file.endswith(".yaml"):
+                file_path = role_configs_dir.joinpath(file)
+                with file_path.open("r") as config_file:
+                    role_config = yaml.safe_load(config_file)
+                    role_name = role_config.get("name")
+                    if role_name:
+                        self.role_configs[role_name] = role_config
 
     def initialize_role(self, role_name, context_files):
         if role_name not in self.role_configs:
-            raise ValueError(f"Role '{role_name}' not found in meta configuration.")
+            raise ValueError(f"Role '{role_name}' not found.")
 
         context_text = "\n".join(context_files.values()) if context_files else ""
         role_config = self.role_configs[role_name]

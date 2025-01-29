@@ -1,46 +1,40 @@
+from attention_forge.clients.base_client import BaseClient
 import requests
-import json
-from attention_forge.clients.message_constructor import construct_messages
 
-def generate_deepseek_response(api_key, model, role_config, user_message):
-    """Generate a response from DeepSeek using the requests library."""
+class DeepSeekClient(BaseClient):
     
-    # Construct the messages without the assistant role
-    messages = construct_messages(role_config, user_message, include_assistant=False)
+    def __init__(self, api_key, model, project_config):
+        super().__init__(api_key, model, project_config)
+        
+    def get_name(self):
+        return "deepseek"
 
-    # Prepare the headers for the request
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {api_key}"
-    }
+    def complete_chat(self, role_config, user_message):
+        messages = self.construct_messages(role_config, user_message, include_assistant=False)
 
-    # Prepare the payload for the request
-    payload = {
-        "model": model,
-        "messages": messages,
-        "stream": False
-    }
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {self.api_key}"
+        }
 
-    # Send request to the DeepSeek API
-    response = requests.post("https://api.deepseek.com/chat/completions", headers=headers, json=payload)
-    
-    # Raise an error for bad responses
-    response.raise_for_status()
-    
-    # Parse the response JSON
-    response_json = response.json()
+        payload = {
+            "model": self.model,
+            "messages": messages,
+            "stream": False
+        }
 
-    # Extract relevant data from the response
-    assistant_reply = response_json["choices"][0]["message"]["content"]
-    request_data = {"model": model, "messages": messages}
+        response = requests.post("https://api.deepseek.com/chat/completions", headers=headers, json=payload)
+        response.raise_for_status()
+        response_json = response.json()
 
-    # Safely handle the absence of token usage information
-    token_usage = {
-        "prompt_tokens": response_json.get('usage', {}).get('prompt_tokens', None),
-        "completion_tokens": response_json.get('usage', {}).get('completion_tokens', None),
-        "total_tokens": response_json.get('usage', {}).get('total_tokens', None)
-    }
+        assistant_reply = response_json["choices"][0]["message"]["content"]
+        request_data = {"model": self.model, "messages": messages}
 
-    response_data = {"response": assistant_reply, "usage": token_usage}
+        token_usage = {
+            "prompt_tokens": response_json.get('usage', {}).get('prompt_tokens', None),
+            "completion_tokens": response_json.get('usage', {}).get('completion_tokens', None),
+            "total_tokens": response_json.get('usage', {}).get('total_tokens', None)
+        }
 
-    return request_data, response_data, assistant_reply
+        response_data = {"response": assistant_reply, "usage": token_usage}
+        return request_data, response_data, assistant_reply

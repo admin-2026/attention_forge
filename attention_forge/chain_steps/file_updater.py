@@ -23,12 +23,14 @@ class FileUpdater(Step):
         Extracts file names and code blocks from responses.
         - Handles code blocks with optional language specifiers.
         - Merges consecutive code blocks under the same file.
-        - Ignores lines with triple backticks unless they are exact end delimiters.
+        - Recognizes "EOF" as the end of file content marker.
+        Warns if file content is found without "EOF".
         """
         extracted_files = []
         current_file = None
         code_content = []
-        in_code_block = False  # Tracks if we're inside a code block
+        in_code_block = False
+        eof_detected = False
 
         lines = response_text.split('\n')
 
@@ -38,28 +40,39 @@ class FileUpdater(Step):
             # Detect filename header
             if stripped_line.startswith('<`') and stripped_line.endswith('`>'):
                 if current_file is not None and code_content:
+                    if not eof_detected:
+                        print(f"⚠️ Warning: EOF not detected for file '{current_file}'.")
                     extracted_files.append((current_file, '\n'.join(code_content).strip()))
                     code_content = []
                 current_file = stripped_line[2:-2]
-                in_code_block = False  # Reset code block state for new file
+                in_code_block = False
+                eof_detected = False
                 continue
 
-            # Check for code block start (any line starting with ```)
+            # Check for start of code block
             if not in_code_block and stripped_line.startswith('```'):
                 in_code_block = True
-                continue  # Skip the start line
+                continue
 
-            # Check for code block end (exactly ```)
-            if in_code_block and stripped_line == '```':
+            # Detect "EOF" which signals the end of content
+            if in_code_block and stripped_line == 'EOF':
                 in_code_block = False
-                continue  # Skip the end line
+                eof_detected = True
+                # Move forward to capture any immediately following end block
+                continue
 
-            # Collect code content if within a code block and a file is active
+            # Check for code block end
+            if not in_code_block and stripped_line == '```':
+                continue
+
+            # Collect code content if within code block
             if in_code_block and current_file is not None:
                 code_content.append(line)
 
         # Add remaining code content if any
         if current_file is not None and code_content:
+            if not eof_detected:
+                print(f"⚠️ Warning: EOF not detected for file '{current_file}'.")
             extracted_files.append((current_file, '\n'.join(code_content).strip()))
 
         return extracted_files

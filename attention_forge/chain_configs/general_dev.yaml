@@ -22,7 +22,7 @@ steps:
       output_data_key: extracted_chat_response
     # use LLM to rewrite the response such that it is easier to parse for file update
     - type: chat
-      role_name: file_update_recognize
+      role_name: file_update_recognizer
       # client: base_client
       # model: base_model
       input_data_key:

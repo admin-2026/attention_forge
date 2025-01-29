@@ -5,7 +5,7 @@ steps:
       output_data_key: user_message
     # chat with LLM
     - type: chat
-      role_name: cyber_friend
+      role_name: assistant
       input_data_key: user_message
       # output_data_key: chat_response
 

@@ -77,6 +77,13 @@ def check_ollama_installed():
         print("❌ Ollama is not installed. Please install it before proceeding.")
         exit(1)
 
+def confirm_ollama_running():
+    """Ask user to confirm that Ollama is running."""
+    confirmation = input("Is Ollama currently running? (yes/no): ").strip().lower()
+    if confirmation != 'yes':
+        print("❌ Please ensure that Ollama is running before proceeding.")
+        exit(1)
+
 def create_dummy_api_key():
     """Create a dummy api-key file with the message 'not used' if it doesn't exist."""
     if not os.path.exists(API_KEY_FILE):
@@ -90,6 +97,7 @@ def generate_project_config():
     """Run the setup specific to Ollama, including installation checks."""
     try:
         check_ollama_installed()
+        confirm_ollama_running()  # New step to confirm Ollama is running
         model_checker = ModelChecker()
         model = model_checker.select_model()
 

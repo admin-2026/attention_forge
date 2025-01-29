@@ -14,8 +14,7 @@ class RBXClient(BaseClient):
         return "rbx"
 
     def complete_chat(self, role_config, user_message):
-        request_data, response_data, assistant_reply = self._generate_response(role_config, user_message)
-        return response_data
+        return self._generate_response(role_config, user_message)
 
     def _generate_response(self, role_config, user_message):
         gateway_base_url = self.project_config.get("gateway_base_url")

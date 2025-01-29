@@ -15,64 +15,82 @@ class FileUpdater(Step):
         for file_name, code_content in extracted_files:
             print(f"🔍 Processing file update: {file_name}")
             update_file(file_name, code_content)
+        
         return None
 
     @staticmethod
     def extract_code_blocks(response_text):
         """
         Extracts file names and code blocks from responses.
-        - Handles code blocks with optional language specifiers.
-        - Merges consecutive code blocks under the same file.
-        - Recognizes "EOF" as the end of file content marker.
-        Warns if file content is found without "EOF".
+        - Looks for file names in `<FILE_NAME>`.
+        - Skips text until encountering a ``` line, then begins recording.
+        - Ignores any optional text after ``` and before the code.
+        - Logs file content until "EOF" followed by ``` is found.
         """
         extracted_files = []
         current_file = None
         code_content = []
         in_code_block = False
-        eof_detected = False
+        found_eof = False
 
         lines = response_text.split('\n')
 
-        for line in lines:
+        for idx, line in enumerate(lines):
             stripped_line = line.strip()
 
             # Detect filename header
-            if stripped_line.startswith('<`') and stripped_line.endswith('`>'):
-                if current_file is not None and code_content:
-                    if not eof_detected:
-                        print(f"⚠️ Warning: EOF not detected for file '{current_file}'.")
+            new_file_name = FileUpdater.extract_filenames(stripped_line)
+            if len(new_file_name) > 0:
+                # If EOF was not found for the previous file, print a warning
+                if current_file and not found_eof:
+                    print(f"⚠️ Warning: 'EOF' not found for the file: {current_file}")
+
+                if current_file:
                     extracted_files.append((current_file, '\n'.join(code_content).strip()))
-                    code_content = []
-                current_file = stripped_line[2:-2]
-                in_code_block = False
-                eof_detected = False
+                    in_code_block = False  # Reset in_code_block after EOF
+                    current_file = None  # Clear file name to look for a new one
+                    found_eof = False
+
+                # Start processing a new file
+                current_file = new_file_name[0]
+                code_content = []  # Reset code content for the new file
+                in_code_block = False  # Reset in_code_block status
+                found_eof = False
                 continue
 
-            # Check for start of code block
+            # Start of a new code block
             if not in_code_block and stripped_line.startswith('```'):
                 in_code_block = True
                 continue
 
-            # Detect "EOF" which signals the end of content
+            # Handling for "EOF" followed by ending code block
             if in_code_block and stripped_line == 'EOF':
-                in_code_block = False
-                eof_detected = True
-                # Move forward to capture any immediately following end block
-                continue
+                eof_line_index = idx + 1
+                if eof_line_index < len(lines) and lines[eof_line_index].strip() == '```':
+                    # Finish current code block
+                    extracted_files.append((current_file, '\n'.join(code_content).strip()))
+                    in_code_block = False  # Reset in_code_block after EOF
+                    current_file = None  # Clear file name to look for a new one
+                    found_eof = True
+                    continue
+                else:
+                    found_eof = False
+                    print(f"⚠️ Warning: 'EOF' found, but no code block end backticks: {current_file}")
 
-            # Check for code block end
-            if not in_code_block and stripped_line == '```':
-                continue
-
-            # Collect code content if within code block
-            if in_code_block and current_file is not None:
+            # Collect code content if within the code block
+            if in_code_block and current_file:
                 code_content.append(line)
 
-        # Add remaining code content if any
-        if current_file is not None and code_content:
-            if not eof_detected:
-                print(f"⚠️ Warning: EOF not detected for file '{current_file}'.")
+        # If EOF was never found for the last file, print a warning
+        if current_file and not found_eof and code_content:
             extracted_files.append((current_file, '\n'.join(code_content).strip()))
+            print(f"⚠️ Warning: 'EOF' not found for the file: {current_file}")
 
         return extracted_files
+    
+    @staticmethod
+    def extract_filenames(text):
+        # Regex pattern to match filenames inside angle brackets
+        pattern = r'<`([^`]+)`>'
+        filenames = re.findall(pattern, text)
+        return filenames

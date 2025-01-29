@@ -1,0 +1,23 @@
+steps:
+    # load usr messages
+    - type: context_load
+      output_data_key: context_files
+    # load usr messages
+    - type: user_input
+      source: stdin|file
+      output_data_key: user_message
+    # chat with LLM
+    - type: chat
+      role_name: booster
+      input_data_key:
+        - user_message
+        - context_files
+      # output_data_key: chat_response
+    # - type: dictionary_rewrite
+      # queries:
+        # - from: response
+          # to: .
+      # input_data_key: chat_response
+      # output_data_key: extracted_chat_response
+    # - type: file_update
+      # input_data_key: extracted_chat_response

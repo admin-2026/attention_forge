@@ -1,5 +1,5 @@
-# Define the Python interpreter
-PYTHON = py
+# Find Python interpreter (cross-platform)
+PYTHON := $(shell command -v python3 || command -v python || echo py)
 
 # Define the default project config file
 PROJECT_CONFIG = attention_forge_project.yaml
@@ -22,16 +22,16 @@ endif
 
 # Install dependencies
 install-dependencies:  ## Install required dependencies
-	$(PYTHON) -m pip install --upgrade pip
-	$(PYTHON) -m pip install -r requirements.txt
+	$(PYTHON) -m pip install --break-system-packages --upgrade pip
+	$(PYTHON) -m pip install --break-system-packages -r requirements.txt
 
 # Install Attention Forge as a local package
 install: install-dependencies ## Install Attention Forge as a local package
-	$(PYTHON) -m pip install .
+	$(PYTHON) -m pip install --break-system-packages .
 
 # Install Attention Forge in development mode
 dev-install:  ## Install Attention Forge in development mode
-	$(PYTHON) -m pip install -e .
+	$(PYTHON) -m pip install --break-system-packages -e .
 
 # Uninstall Attention Forge
 uninstall:  ## Uninstall Attention Forge package
@@ -89,15 +89,15 @@ test: ## Run unit tests
 help:
 	@echo ""
 	@echo "Available Makefile commands:"
-	@echo "  install              - Install required dependencies"
-	@echo "  install-package      - Install Attention Forge as a local package"
-	@echo "  dev-install          - Install Attention Forge in development mode"
-	@echo "  uninstall            - Uninstall Attention Forge package"
-	@echo "  run                  - Run Attention Forge with the developer assistant role"
-	@echo "  run-role ROLE=<role> - Run Attention Forge with a custom role"
-	@echo "  revert               - Revert a file from the latest backup"
-	@echo "  format               - Format code using black"
-	@echo "  clean                - Remove cache files, logs, and backups"
-	@echo "  test                 - Run unit tests"
-	@echo "  help                 - Show available commands"
+	@echo "  install                 - Install required dependencies"
+	@echo "  install-package         - Install Attention Forge as a local package"
+	@echo "  dev-install             - Install Attention Forge in development mode"
+	@echo "  uninstall               - Uninstall Attention Forge package"
+	@echo "  run                     - Run Attention Forge with the developer assistant role"
+	@echo "  run-chain CHAIN=<chain> - Run Attention Forge with a custom chain"
+	@echo "  revert                  - Revert a file from the latest backup"
+	@echo "  format                  - Format code using black"
+	@echo "  clean                   - Remove cache files, logs, and backups"
+	@echo "  test                    - Run unit tests"
+	@echo "  help                    - Show available commands"
 	@echo ""

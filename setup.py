@@ -13,7 +13,8 @@ setup(
         "attention_forge": [
             "role_configs/*.yaml",
             "chain_configs/*.yaml",
-            "setup_tools/plugins/*.py"  # Include plugins
+            "setup_tools/plugins/*.py",  # Include plugins
+            "api-keys/*.yaml"
         ],
     },
     install_requires=[

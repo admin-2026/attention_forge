@@ -6,8 +6,8 @@ import hashlib
 class ContextLoader(Step):
     CONTEXT_CONFIG_FILE = "attention_forge_context.yaml"
 
-    def __init__(self, api_key):
-        self.api_key = api_key
+    def __init__(self, api_key_loader):  # Change to use api_key_loader
+        self.api_key_loader = api_key_loader
         self.loaded_files = {}
         self.file_signatures = {}
 
@@ -98,7 +98,10 @@ class ContextLoader(Step):
         include_paths = config.get("include_paths", [])
         tree_paths = config.get("tree_paths", [])
         ignore_paths = self.normalize_paths(config.get("ignore_paths", []))
-        ignore_paths.add(os.path.abspath(self.api_key))
+
+        # Add loaded API key files to the ignore paths
+        api_key_files = map(os.path.abspath, self.api_key_loader.get_loaded_files())
+        ignore_paths.update(api_key_files)
 
         loading_error = False
 

@@ -38,3 +38,9 @@ user_message.txt
 # Ignore attention-forge configs
 attention_forge_context.yaml
 attention_forge_project.yaml
+
+# Ignore all YAML files in attention_forge/api-keys/
+attention_forge/api-keys/*.yaml
+
+# Exclude example-key.yaml from being ignored
+!attention_forge/api-keys/example-key.yaml

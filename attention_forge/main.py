@@ -2,7 +2,7 @@ import sys
 import os
 import uuid
 
-from attention_forge.api_key_loader import load_api_key
+from attention_forge.api_key_loader import ApiKeyLoader
 from attention_forge.config_loader import load_project_config
 from attention_forge.file_manager import set_run_id
 from attention_forge.role import Role
@@ -21,8 +21,12 @@ def main():
 
     try:
         project_config = load_project_config(project_config_path)
-        api_key_path = project_config.get("api_key_file", "api-key")
-        api_key = load_api_key(api_key_path)
+        api_keys_dir = project_config.get("api_keys_dir", "api-keys")
+        additional_api_key_file = project_config.get("api_key_file", None)
+        
+        # Instantiate ApiKeyLoader with additional_api_key_file
+        api_key_loader = ApiKeyLoader(api_keys_dir=api_keys_dir, additional_api_key_file=additional_api_key_file)
+        # Pass ApiKeyLoader object instead of api_key
     except Exception as e:
         print(f"Configuration error: {e}")
         sys.exit(1)
@@ -31,8 +35,8 @@ def main():
 
     role_handler = Role()
 
-    # Create Chain object
-    chain = Chain(chain_name, api_key, role_handler, project_config)
+    # Pass the api_key_loader instead of api_key
+    chain = Chain(chain_name, api_key_loader, role_handler, project_config)
 
     try:
         chain.run()

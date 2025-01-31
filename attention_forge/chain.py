@@ -8,17 +8,17 @@ from attention_forge.chain_steps.file_reverter import FileReverter
 from attention_forge.chain_steps.context_loader_step import ContextLoader  # Import ContextLoader at the top
 
 class Chain:
-    def __init__(self, chain_name, api_key, role_handler, project_config):
+    def __init__(self, chain_name, api_key_loader, role_handler, project_config):
         self.chain_name = chain_name
+        self.api_key_loader = api_key_loader  # Store ApiKeyLoader instance
         self.chain_dir = os.path.join(os.path.dirname(__file__), "chain_configs")
         self.chain_file_path = os.path.join(self.chain_dir, f"{self.chain_name}.yaml")
 
         if not os.path.isfile(self.chain_file_path):
             raise FileNotFoundError(f"Chain file '{self.chain_file_path}' not found.")
 
-        self.api_key = api_key  # Make api_key a member of the class
         self.steps = self.load_chain_config()
-        self.chat_builder = ChatBuilder(api_key, role_handler, project_config)
+        self.chat_builder = ChatBuilder(api_key_loader, role_handler, project_config)
         self.role_handler = role_handler
         self.project_config = project_config
         self.objects_list = self.create_objects_from_steps()
@@ -45,8 +45,8 @@ class Chain:
                     step
                 )
                 objects.append((chat_object, step))
-            elif step_type == "context_load":  # Add new step
-                context_loader = ContextLoader(self.api_key)  # Use the api_key as a class member
+            elif step_type == "context_load":  # Modify to pass the ApiKeyLoader
+                context_loader = ContextLoader(self.api_key_loader)
                 objects.append((context_loader, step))
             elif step_type == "file_update":
                 file_updater = FileUpdater()

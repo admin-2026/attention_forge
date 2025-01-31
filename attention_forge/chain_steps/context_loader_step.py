@@ -79,7 +79,7 @@ class ContextLoader(Step):
             for file in files:
                 file_path = os.path.join(root, file)
                 if self.is_path_ignored(file_path, ignore_paths):
-                    print(f"❌ Ignoring file: {file_path}")
+                    print(f"⏩ Ignoring file: {file_path}")
                 else:
                     print(f"✅ Loading file: {file_path}")
                     all_files.append(file_path)
@@ -113,12 +113,12 @@ class ContextLoader(Step):
 
             if os.path.isdir(abs_path):
                 if self.is_path_ignored(path, ignore_paths):
-                    print(f"❌ Ignoring directory: {path}")
+                    print(f"⏩ Ignoring directory: {path}")
                     continue
                 files = self.get_files_from_directory(abs_path, ignore_paths)
             elif os.path.isfile(abs_path):
                 if self.is_path_ignored(path, ignore_paths):
-                    print(f"❌ Ignoring file: {path}")
+                    print(f"⏩ Ignoring file: {path}")
                     continue
                 print(f"✅ Loading file: {path}")
                 files = [abs_path]
@@ -148,7 +148,7 @@ class ContextLoader(Step):
             abs_dir_path = os.path.abspath(dir_path)
             if os.path.isdir(abs_dir_path):
                 if self.is_path_ignored(dir_path, ignore_paths):
-                    print(f"❌ Ignoring directory for tree generation: {dir_path}")
+                    print(f"⏩ Ignoring directory for tree generation: {dir_path}")
                     continue
                 print(f"📁 Generating tree for directory: {dir_path}")
                 tree_structure = self.get_directories_tree(abs_dir_path, ignore_paths)

@@ -7,7 +7,8 @@ class OpenAIClient(BaseClient):
         super().__init__(api_key, model, project_config)
         self.client = openai.Client(api_key=api_key)
 
-    def get_name(self):
+    @staticmethod
+    def get_name():
         return "openai"
 
     def complete_chat(self, role_config, user_message):

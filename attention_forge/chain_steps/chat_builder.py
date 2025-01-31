@@ -27,8 +27,8 @@ class ChatBuilder:
                     attr = getattr(module, attr_name)
                     # Ensure the class is a subclass of BaseClient and is not BaseClient itself
                     if isinstance(attr, type) and issubclass(attr, BaseClient) and attr is not BaseClient:
-                        client_instance = attr(None, None, self.project_config)  # No API key here
-                        client_map[client_instance.get_name().lower()] = attr
+                        # Use the static method directly to get the client name
+                        client_map[attr.get_name().lower()] = attr
 
         return client_map
 
@@ -64,6 +64,3 @@ class ChatBuilder:
             model,
             self.chat_logger
         )
-```
-
-EOF

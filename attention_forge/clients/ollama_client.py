@@ -5,7 +5,8 @@ class OllamaClient(BaseClient):
     def __init__(self, api_key, model, project_config):
         super().__init__(api_key, model, project_config)
     
-    def get_name(self):
+    @staticmethod
+    def get_name():
         return "ollama"
 
     def complete_chat(self, role_config, user_message):

@@ -1,16 +1,16 @@
 ## User Guide for Attention Forge
 
-Welcome to **Attention Forge** – your friendly AI-powered assistant for coding, chat, and project management!
+Welcome to **Attention Forge** - your friendly AI-powered assistant for coding, chat, and project management!
 
-### 🚀 Getting Started
+### Getting Started
 
 #### Prerequisites
 - **Python 3.8** or higher
 - An API Key for your chosen AI client (OpenAI or DeepSeek). Some clients don't need API key (Ollama)
 
-#### 🔧 Installation
+#### Installation
 
-Ready to dive in? Let’s get your setup started!
+Ready to dive in? Let's get your setup started!
 
 1. **Install**:
   Open your terminal and run:
@@ -27,7 +27,7 @@ Ready to dive in? Let’s get your setup started!
    attention-forge-init
    ```
 
-### 🤖 Using Attention Forge
+### Using Attention Forge
 
 **Provide Context**:
 Open the `attention_forge_context.yaml` and provide some context for your conversation. The amount of tokens your LLM can take is probably limited. You don't want to include everything at once. Select your context with care.
@@ -60,13 +60,13 @@ Execute operations with AI assistance:
 
 Welcome, Developer! Dive deep into Attention Forge, where innovation meets AI.
 
-### 📚 Project Features
+### Project Features
 
 - **Role-Based Assistant**: Customize AI behavior using YAML configuration.
 - **Log & Backup**: Maintain history and backups of all interactions and changes.
 - **Plugin Magic**: LLM Roles, Clients, API-keys, Setup tools, Chains are all plugins.
 
-### 💻 Development Setup
+### Development Setup
 
 You can use `attention-forge` itself to develop the `attention-foge` and this is the recommended way. Run `attention-forge-init` in the repo to setup the env for your development. 
 
@@ -92,10 +92,10 @@ You can use `attention-forge` itself to develop the `attention-foge` and this is
      make clean
      ```
 
-### 🛠 Contributing
+### Contributing
 
 We welcome your improvements! Fork this repository and submit a pull request for new features or bug fixes.
 
-### 📜 License
+### License
 
 This project is under the MIT License.

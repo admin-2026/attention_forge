@@ -26,7 +26,12 @@ class Role:
         if role_name not in self.role_configs:
             raise ValueError(f"Role '{role_name}' not found.")
 
+        # Initialize context text
         context_text = "\n".join(context_files.values()) if context_files else ""
         role_config = self.role_configs[role_name]
-        role_config["developer_message"] += f"\n\nHere are some relevant code files:\n\n{context_text}"
+        
+        # Add developer message only if context is not empty
+        if context_text:
+            role_config["developer_message"] += f"\n\nHere are some relevant code files:\n\n{context_text}"
+
         return role_config

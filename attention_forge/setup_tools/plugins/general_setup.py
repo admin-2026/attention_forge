@@ -1,54 +1,34 @@
-import yaml
-import os
+from attention_forge.setup_tools.base_plugin import BaseSetupPlugin
 
-PROJECT_FILE = 'attention_forge_project.yaml'
+class GeneralSetupPlugin(BaseSetupPlugin):
 
-def prompt_user_for_config():
-    """Prompt the user for API key, client, and model information with default values."""
-    api_key = input("Enter the API key file path (default: 'api-key'): ").strip()
-    client = input("Enter the client (e.g., openai, ollama) (default: 'openai'): ").strip()
-    model = input("Enter the model to be used (default: 'gpt-4o'): ").strip()
+    def prompt_user_for_config(self):
+        client = input("Enter the client (e.g., openai, deepseek) (default: 'openai'): ").strip()
+        model = input("Enter the model to be used (default: 'gpt-4o'): ").strip()
 
-    # Use defaults if inputs are empty
-    api_key = api_key if api_key else 'api-key'
-    client = client if client else 'openai'
-    model = model if model else 'gpt-4o'
+        client = client if client else 'openai'
+        model = model if model else 'gpt-4o'
 
-    return {
-        'api_key_file': api_key,
-        'client': client,
-        'model': model,
-        'base_client': client,  # Set the same as the chosen client for base_client
-        'base_model': model,    # Set the same as the chosen model for base_model
-        'log_file': '.attention_forge/chat_history.log', # Default log_file path
-        'user_message_file': 'user_message.txt'  # Default user_message_file
-    }
+        return {
+            # 'api_key_file': api_key,
+            'client': client,
+            'model': model,
+            'base_client': client,
+            'base_model': model,
+            'log_file': '.attention_forge/chat_history.log',
+            'user_message_file': 'user_message.txt'
+        }
 
-def update_project_yaml(config):
-    """Update the project YAML with user-provided configuration."""
-    if os.path.exists(PROJECT_FILE):
-        choice = input(f"{PROJECT_FILE} already exists. Do you want to overwrite it? (yes/no): ").strip().lower()
-        if choice != 'yes':
-            print(f"ℹ️ Preserving existing {PROJECT_FILE}.")
-            return
+    @staticmethod
+    def get_client():
+        return "general"
 
-    with open(PROJECT_FILE, 'w') as file:
-        file.write(yaml.dump(config, default_flow_style=False))
-
-    print(f"✅ Initialized {PROJECT_FILE} with user-provided values.")
-    print(f"ℹ️ log_file set to: {config['log_file']}")
-    print(f"ℹ️ user_message_file set to: {config['user_message_file']}")
-
-def get_client():
-    """Return the client this setup is for."""
-    return "general"
-
-def generate_project_config():
-    """General setup for Attention Forge."""
-    try:
-        config = prompt_user_for_config()
-        update_project_yaml(config)
-        return True
-    except Exception as e:
-        print(f"❌ Error in general setup: {str(e)}")
-        return False
+    def generate_project_config(self):
+        try:
+            config = self.prompt_user_for_config()
+            self.create_api_key_file()
+            self.update_project_yaml(config)
+            return True
+        except Exception as e:
+            print(f"❌ Error in general setup: {str(e)}")
+            return False

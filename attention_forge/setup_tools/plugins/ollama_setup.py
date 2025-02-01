@@ -3,9 +3,10 @@ import ollama
 import yaml
 import os
 
+from attention_forge.setup_tools.base_plugin import BaseSetupPlugin
+
 PROJECT_FILE = 'attention_forge_project.yaml'
 DEFAULT_MODEL = "deepseek-r1:8b"
-API_KEY_FILE = 'api-key'
 
 class ModelChecker:
     def __init__(self):
@@ -64,66 +65,48 @@ class ModelChecker:
         except Exception as e:
             print(f"Error: Failed to pull model '{model_name}'. {str(e)}")
 
-def get_client():
-    """Return the client this setup is for."""
-    return "ollama"
+class OllamaSetupPlugin(BaseSetupPlugin):
+    DEFAULT_MODEL = "deepseek-r1:8b"
 
-def check_ollama_installed():
-    """Check if Ollama is installed."""
-    try:
-        subprocess.run(["ollama", "--version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        print("✅ Ollama is installed.")
-    except (subprocess.CalledProcessError, FileNotFoundError):
-        print("❌ Ollama is not installed. Please install it before proceeding.")
-        exit(1)
+    @staticmethod
+    def get_client():
+        return "ollama"
 
-def confirm_ollama_running():
-    """Ask user to confirm that Ollama is running."""
-    confirmation = input("Is Ollama currently running? (yes/no): ").strip().lower()
-    if confirmation != 'yes':
-        print("❌ Please ensure that Ollama is running before proceeding.")
-        exit(1)
+    def check_ollama_installed(self):
+        """Check if Ollama is installed."""
+        try:
+            subprocess.run(["ollama", "--version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            print("✅ Ollama is installed.")
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            print("❌ Ollama is not installed. Please install it before proceeding.")
+            exit(1)
 
-def create_dummy_api_key():
-    """Create a dummy api-key file with the message 'not used' if it doesn't exist."""
-    if not os.path.exists(API_KEY_FILE):
-        with open(API_KEY_FILE, 'w') as f:
-            f.write("not used")
-        print(f"✅ Created dummy {API_KEY_FILE} with message 'not used'.")
-    else:
-        print(f"ℹ️ {API_KEY_FILE} already exists.")
+    def confirm_ollama_running(self):
+        """Ask user to confirm that Ollama is running."""
+        confirmation = input("Make sure Ollama is currently running? (yes/no): ").strip().lower()
+        if confirmation != 'yes':
+            print("❌ Please ensure that Ollama is running before proceeding.")
+            exit(1)
 
-def generate_project_config():
-    """Run the setup specific to Ollama, including installation checks."""
-    try:
-        check_ollama_installed()
-        confirm_ollama_running()  # New step to confirm Ollama is running
-        model_checker = ModelChecker()
-        model = model_checker.select_model()
+    def generate_project_config(self):
+        try:
+            self.check_ollama_installed()
+            self.confirm_ollama_running()
+            model_checker = ModelChecker()
+            model = model_checker.select_model()
 
-        # Create a dummy API key file
-        create_dummy_api_key()
+            config = {
+                'client': 'ollama',
+                'model': model if model else self.DEFAULT_MODEL,
+                'base_client': 'ollama',
+                'base_model': model if model else self.DEFAULT_MODEL,
+                'log_file': '.attention_forge/chat_history.log',
+                'user_message_file': 'user_message.txt'
+            }
 
-        # Default configurations
-        config = {
-            'api_key_file': API_KEY_FILE,
-            'client': 'ollama',
-            'model': model if model else DEFAULT_MODEL,
-            'base_client': 'ollama',
-            'base_model': model if model else DEFAULT_MODEL,
-            'log_file': '.attention_forge/chat_history.log',
-            'user_message_file': 'user_message.txt'
-        }
+            self.update_project_yaml(config)
 
-        # Write to the project YAML file
-        if not os.path.exists(PROJECT_FILE) or input(f"{PROJECT_FILE} already exists. Do you want to overwrite it? (yes/no): ").strip().lower() == 'yes':
-            with open(PROJECT_FILE, 'w') as file:
-                file.write(yaml.dump(config, default_flow_style=False))
-            print(f"✅ Initialized {PROJECT_FILE} with values.")
-            print(f"ℹ️ log_file set to: {config['log_file']}")
-            print(f"ℹ️ user_message_file set to: {config['user_message_file']}")
-
-        return True
-    except Exception as e:
-        print(f"❌ Error in Ollama setup: {str(e)}")
-        return False
+            return True
+        except Exception as e:
+            print(f"❌ Error in Ollama setup: {str(e)}")
+            return False

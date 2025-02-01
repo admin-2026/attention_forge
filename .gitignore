@@ -44,3 +44,4 @@ attention_forge/api-keys/*.yaml
 
 # Exclude example-key.yaml from being ignored
 !attention_forge/api-keys/example-key.yaml
+!attention_forge/api-keys/ollama-key.yaml

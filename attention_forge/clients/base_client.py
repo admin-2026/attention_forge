@@ -21,9 +21,5 @@ class BaseClient(metaclass=abc.ABCMeta):
         return messages
 
     @abc.abstractmethod
-    def get_name(self):
-        pass
-
-    @abc.abstractmethod
     def complete_chat(self, user_message):
         pass

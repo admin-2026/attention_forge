@@ -26,7 +26,7 @@ class GeneralSetupPlugin(BaseSetupPlugin):
     def generate_project_config(self):
         try:
             config = self.prompt_user_for_config()
-            self.create_api_key_file()
+            self.create_api_key_file(config)
             self.update_project_yaml(config)
             return True
         except Exception as e:

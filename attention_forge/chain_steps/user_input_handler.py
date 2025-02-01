@@ -22,7 +22,7 @@ class UserInputHandler(Step):
 
         if not user_message or user_message.lower() == "exit":
             if user_message.lower() == "exit":
-                print("Exiting the program. No request sent to OpenAI.")
+                print("Exiting the program. No request sent to LLM.")
                 exit(0)
 
         return user_message

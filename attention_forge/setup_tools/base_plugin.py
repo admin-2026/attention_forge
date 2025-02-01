@@ -31,15 +31,29 @@ class BaseSetupPlugin:
                 return
 
         with open(BaseSetupPlugin.CONTEXT_FILE, 'w') as file:
-            file.write("# Configuration file for Attention Forge\n")
+            file.write("# Context Configuration File\n")
+            file.write("# This file defines various paths that will be considered during the during the conversation with AI.\n")
             file.write("#\n")
             for key, value in BaseSetupPlugin.context_defaults.items():
-                if key in ['include_paths', 'tree_paths', 'ignore_paths']:
-                    file.write(f"# {key}:\n")
-                    for item in value:
-                        file.write(f"# - {item}\n")
-                else:
-                    file.write(yaml.dump({key: value}, default_flow_style=False))
+                file.write("\n\n")
+                if key == 'include_paths':
+                    file.write("# Include Paths:\n")
+                    file.write("# These are files or directories whose content will be included\n")
+                    file.write("# as context when interacting with the AI model.\n")
+                elif key == 'tree_paths':
+                    file.write("# Tree Paths:\n")
+                    file.write("# These are directories whose directory structure (but not the content)\n")
+                    file.write("# will be loaded during conversations with the AI model.\n")
+                elif key == 'ignore_paths':
+                    file.write("# Ignore Paths:\n")
+                    file.write("# These are files or directories to be excluded from context loading.\n")
+                    file.write("# Typically, you can ignore build artifacts, caches, binaries, etc.\n")
+
+                file.write("\n")
+                file.write(f"# {key}:\n")
+                for item in value:
+                    file.write(f"# - {item}\n")
+                
             file.write("\n")
 
         print(f"✅ Initialized {BaseSetupPlugin.CONTEXT_FILE} with default values.")
@@ -47,8 +61,8 @@ class BaseSetupPlugin:
     def create_user_message_file(self):
         if not os.path.exists(BaseSetupPlugin.USER_MESSAGE_FILE):
             with open(BaseSetupPlugin.USER_MESSAGE_FILE, 'w') as f:
-                f.write("# You can enter commands here instead of using the command line.\n")
-            print(f"✅ Created {BaseSetupPlugin.USER_MESSAGE_FILE} with instructional message.")
+                pass  # Create the file without writing anything
+            print(f"✅ Created {BaseSetupPlugin.USER_MESSAGE_FILE}.")
         else:
             print(f"ℹ️ {BaseSetupPlugin.USER_MESSAGE_FILE} already exists.")
 

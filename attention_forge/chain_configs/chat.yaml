@@ -1,7 +1,7 @@
 steps:
     # load usr messages
     - type: user_input
-      source: stdin|file
+      source: stdin
       output_data_key: user_message
     # chat with LLM
     - type: chat

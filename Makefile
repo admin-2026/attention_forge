@@ -34,23 +34,33 @@ endif
 create-venv: ## Create a virtual environment
 	$(PYTHON) -m venv $(VENV_DIR)
 
+# Install dependencies globally
+install: ## Install required dependencies globally, with break-system-packages
+	$(PYTHON) -m pip install --break-system-packages --upgrade pip
+	$(PYTHON) -m pip install --break-system-packages -r requirements.txt
+	$(PYTHON) -m pip install --break-system-packages .
+
 # Install dependencies in the virtual environment
-install-dependencies: create-venv ## Install required dependencies
+venv-install: create-venv ## Install required dependencies in the virtual environment
 	$(PYTHON_ENV) -m pip install --upgrade pip
 	$(PYTHON_ENV) -m pip install -r requirements.txt
-
-# Install Attention Forge as a local package in the virtual environment
-install: install-dependencies ## Install Attention Forge as a local package
 	$(PYTHON_ENV) -m pip install .
 
 # Install Attention Forge in development mode in the virtual environment
-dev-install: create-venv ## Install Attention Forge in development mode
+dev-install: create-venv ## Install Attention Forge in development mode inside virtual environment
 	$(PYTHON_ENV) -m pip install -e .
 
 # Uninstall Attention Forge
 uninstall: ## Uninstall Attention Forge package
-	$(PYTHON_ENV) setup.py clean --all
-	$(PYTHON_ENV) -m pip uninstall -y attention_forge
+	$(PYTHON) -m pip uninstall -y attention_forge
+
+# Uninstall the virtual environment completely
+venv-uninstall: ## Remove the virtual environment
+ifeq ($(OS), Windows)
+	@if exist $(VENV_DIR) rmdir /S /Q $(VENV_DIR)
+else
+	@rm -rf $(VENV_DIR)
+endif
 
 # Run the main script with the developer assistant chain in virtual environment
 run: ## Run Attention Forge with the specified default chain
@@ -108,10 +118,11 @@ help:
 	@echo ""
 	@echo "Available Makefile commands:"
 	@echo "  create-venv             - Create a virtual environment"
-	@echo "  install                 - Install required dependencies"
-	@echo "  install-package         - Install Attention Forge as a local package"
+	@echo "  install                 - Install required dependencies globally"
+	@echo "  venv-install            - Install required dependencies in the virtual environment"
 	@echo "  dev-install             - Install Attention Forge in development mode"
 	@echo "  uninstall               - Uninstall Attention Forge package"
+	@echo "  venv-uninstall          - Remove the virtual environment"
 	@echo "  run                     - Run Attention Forge with the developer assistant role"
 	@echo "  run-chain CHAIN=<chain> - Run Attention Forge with a custom chain"
 	@echo "  revert                  - Revert a file from the latest backup"

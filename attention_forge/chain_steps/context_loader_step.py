@@ -109,6 +109,14 @@ class ContextLoader(Step):
             print("ℹ️ No files or directories specified in include_paths. Skipping context loading.")
 
         if not include_paths and not tree_paths:
+            # Check if the context is empty and ask for user confirmation
+            if not self.loaded_files:
+                print("⚠️ Warning: No context was loaded. The context is empty.")
+                print(f"ℹ️ You can add files or directories in the '{self.CONTEXT_CONFIG_FILE}' to include in the context.")
+                proceed_with_empty = input("Do you want to proceed with an empty context? (yes/no): ")
+                if proceed_with_empty.lower() != 'yes':
+                    print("Operation aborted by user.")
+                    exit(0)
             return self.loaded_files
 
         for path in include_paths:

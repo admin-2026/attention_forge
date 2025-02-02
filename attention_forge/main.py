@@ -7,6 +7,7 @@ from attention_forge.config_loader import load_project_config
 from attention_forge.file_manager import set_run_id
 from attention_forge.role import Role
 from attention_forge.chain import Chain
+from attention_forge.file_checker import FileChecker  # Import the FileChecker class
 
 def main():
     run_id = str(uuid.uuid4())
@@ -14,6 +15,17 @@ def main():
 
     chain_name = sys.argv[1] if len(sys.argv) > 1 else "general_dev"
     project_config_path = sys.argv[2] if len(sys.argv) > 2 else "attention_forge_project.yaml"
+
+    # Instantiate and run the file checker
+    file_checker = FileChecker(project_file=project_config_path)
+    file_check_result = file_checker.run()
+
+    if file_check_result['status'] == 'not_initialized':
+        sys.exit(1)
+    elif file_check_result['status'] == 'error':
+        print("Exiting due to initialization error.")
+        sys.exit(1)
+    # Continue if status is 'exists' or 'initialized'
 
     if not os.path.isfile(project_config_path):
         print(f"Error: Project config file '{project_config_path}' not found.")
@@ -26,7 +38,6 @@ def main():
         
         # Instantiate ApiKeyLoader with additional_api_key_file
         api_key_loader = ApiKeyLoader(api_keys_dir=api_keys_dir, additional_api_key_file=additional_api_key_file)
-        # Pass ApiKeyLoader object instead of api_key
     except Exception as e:
         print(f"Configuration error: {e}")
         sys.exit(1)

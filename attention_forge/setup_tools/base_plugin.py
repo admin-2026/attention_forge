@@ -13,7 +13,7 @@ class BaseSetupPlugin:
     context_defaults = {
         'include_paths': ['./src', './scripts'],
         'tree_paths': ['./'],
-        'ignore_paths': ['.attention_forge/', './.git/', 'api-key']
+        'ignore_paths': ['.attention_forge/', './.git/', 'api-key', 'venv/']
     }
 
     def create_build_directory(self):

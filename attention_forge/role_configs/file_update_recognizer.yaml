@@ -5,6 +5,7 @@ developer_message: |
   2. Output the file path enclosed by <` and `> (for example: <`FILE_PATH`>).
   3. Output the full file content (i.e., do not only output file segments).
   4. Ensure that the updated file content ends with the literal text "EOF" on its own line.
+  5. Output only the results and do not output explanation to the steps.
   When responding, strictly follow these rules.
 
 assistant_message: "Hi! Provide me file update instructions. I will rewrite it for parsing?"

@@ -39,8 +39,11 @@ class FileUpdater(Step):
             stripped_line = line.strip()
 
             # Detect filename header
-            new_file_name = FileUpdater.extract_filenames(stripped_line)
-            if len(new_file_name) > 0:
+            file_names = FileUpdater.extract_filenames(stripped_line)
+            if file_names:
+                # Use the last file name detected
+                new_file_name = file_names[-1]
+
                 # If EOF was not found for the previous file, print a warning
                 if current_file and not found_eof:
                     print(f"⚠️ Warning: 'EOF' not found for the file: {current_file}")
@@ -52,14 +55,14 @@ class FileUpdater(Step):
                     found_eof = False
 
                 # Start processing a new file
-                current_file = new_file_name[0]
+                current_file = new_file_name
                 code_content = []  # Reset code content for the new file
                 in_code_block = False  # Reset in_code_block status
                 found_eof = False
                 continue
 
             # Start of a new code block
-            if not in_code_block and stripped_line.startswith('```'):
+            if not in_code_block and '```' in stripped_line:
                 in_code_block = True
                 continue
 
@@ -91,6 +94,6 @@ class FileUpdater(Step):
     @staticmethod
     def extract_filenames(text):
         # Regex pattern to match filenames inside angle brackets
-        pattern = r'<`([^`]+)`>'
-        filenames = re.findall(pattern, text)
-        return filenames
+        # Modified to return all filename matches found in the text
+        pattern = r"<`([^`]+?)`>"
+        return re.findall(pattern, text)

@@ -125,5 +125,29 @@ EOF
         ]
         self.assertEqual(FileUpdater.extract_code_blocks(response_text), expected_output)
 
+    def test_extract_code_blocks_with_leading_text_before_backticks(self):
+        response_text = """
+<`example.py`>This is some text before the code block.
+some text before backticks ```
+code
+EOF
+```
+"""
+        expected_output = [
+            ('example.py', "code")]
+        self.assertEqual(FileUpdater.extract_code_blocks(response_text), expected_output)
+
+    def test_multiple_files_names(self):
+        response_text = """
+<`should_be_dropped.py`> and <`example.py`> some text
+some text before backticks ```
+code
+EOF
+```
+"""
+        expected_output = [
+            ('example.py', "code")]
+        self.assertEqual(FileUpdater.extract_code_blocks(response_text), expected_output)
+
 if __name__ == "__main__":
     unittest.main()

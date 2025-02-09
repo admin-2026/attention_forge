@@ -35,9 +35,22 @@ class TestContextLoader(unittest.TestCase):
         self.assertEqual(self.context_loader.normalize_paths(paths), expected_normalized)
 
     def test_is_path_ignored(self):
-        ignore_paths = self.context_loader.normalize_paths(["ignored_path"])
+        ignore_paths = self.context_loader.compile_ignore_patterns(["ignored_path/"])
         self.assertTrue(self.context_loader.is_path_ignored("ignored_path/file.txt", ignore_paths))
         self.assertFalse(self.context_loader.is_path_ignored("included_path/file.txt", ignore_paths))
+
+    def test_is_path_ignored_with_gitignore_pattern(self):
+        # Test relative pattern
+        self.assertTrue(self.context_loader.is_path_ignored(
+            "project/src/__pycache__/file",
+            self.context_loader.compile_ignore_patterns(["__pycache__/"])
+        ))
+
+        # Test absolute pattern
+        self.assertTrue(self.context_loader.is_path_ignored(
+            "absolute/path/to/ignore/file.txt",
+            self.context_loader.compile_ignore_patterns(["absolute/path/to/ignore/"])
+        ))
 
     def test_get_files_from_directory(self):
         directory = "/test_dir"
@@ -54,7 +67,7 @@ class TestContextLoader(unittest.TestCase):
         # Use side_effect to simulate different states of the directory structure
         self.fs_helper_mock.list_dir.side_effect = [dir_structure_1, dir_structure_2]
 
-        ignore_paths = set()
+        ignore_paths = self.context_loader.compile_ignore_patterns([])
         expected_files = [
             os.path.join(directory, "file1.txt"),
             os.path.join(directory, "file2.py"),
@@ -71,7 +84,7 @@ class TestContextLoader(unittest.TestCase):
         self.assertEqual(sorted(files), sorted(expected_files))
 
     def test_get_files_from_directory_with_ignored_paths(self):
-        directory = "/test_dir"
+        directory = "test_dir"
         
         # Define a directory structure
         dir_structure_1 = [
@@ -86,7 +99,7 @@ class TestContextLoader(unittest.TestCase):
         self.fs_helper_mock.list_dir.side_effect = [dir_structure_1, dir_structure_2]
 
         # Define ignored paths
-        ignore_paths = self.context_loader.normalize_paths(["/test_dir/subdir"])
+        ignore_paths = self.context_loader.compile_ignore_patterns(["/test_dir/subdir/"])
 
         # Create an instance with the mocked file system helper
         context_loader = ContextLoader(api_key_loader=self.mock_api_key_loader, fs_helper=self.fs_helper_mock)
@@ -103,6 +116,35 @@ class TestContextLoader(unittest.TestCase):
         # Assert
         self.assertEqual(sorted(files), sorted(expected_files))
 
+    def test_get_files_from_directory_with_ignored_glob_patterns(self):
+        directory = "test_dir"
+        # Define a directory structure
+        dir_structure_1 = [
+            (directory, ("subdir",), ("file1.txt", "file2.py")),
+        ]
+
+        dir_structure_2 = [
+            (os.path.join(directory, "subdir"), (), ("file3.js",)),
+        ]
+
+        # Use side_effect to simulate different states of the directory structure
+        self.fs_helper_mock.list_dir.side_effect = [dir_structure_1, dir_structure_2]
+
+        context_loader = ContextLoader(
+            api_key_loader=self.mock_api_key_loader,
+            fs_helper=self.fs_helper_mock
+        )
+
+        # Ignore all JS files
+        ignore_patterns = context_loader.compile_ignore_patterns(["*.js"])
+
+        files = context_loader.get_files_from_directory(directory, ignore_patterns)
+        expected_files = [
+            os.path.join(directory, "file1.txt"),
+            os.path.join(directory, "file2.py")
+        ]
+        self.assertEqual(sorted(files), sorted(expected_files))
+
     def test_process_file(self):
         fake_file = "/test_dir/file.txt"
         
@@ -117,8 +159,10 @@ class TestContextLoader(unittest.TestCase):
         # Make sure that the read_file method will correctly return the mock content
         self.context_loader.fs_helper = self.fs_helper_mock
         
+        ignore_patterns = self.context_loader.compile_ignore_patterns([])
+        
         # Method Call
-        result = self.context_loader.process_file(fake_file, set())
+        result = self.context_loader.process_file(fake_file, ignore_patterns)
 
         # Verify that load_file_content has been called
         self.assertTrue(result)
@@ -132,11 +176,12 @@ class TestContextLoader(unittest.TestCase):
         self.context_loader.get_files_from_directory = MagicMock(return_value=["/test_dir/file1.txt"])
         self.context_loader.process_file = MagicMock(return_value=True)
 
-        result = self.context_loader.process_directory(fake_directory, set())
+        ignore_patterns = self.context_loader.compile_ignore_patterns([])
+        result = self.context_loader.process_directory(fake_directory, ignore_patterns)
 
         self.assertTrue(result)
-        self.context_loader.get_files_from_directory.assert_called_once_with(fake_directory, set())
-        self.context_loader.process_file.assert_called_once_with("/test_dir/file1.txt", set())
+        self.context_loader.get_files_from_directory.assert_called_once_with(fake_directory, ignore_patterns)
+        self.context_loader.process_file.assert_called_once_with("/test_dir/file1.txt", ignore_patterns)
 
     def test_load_file_content(self):
         fake_file_path = "file.py"
@@ -173,12 +218,12 @@ class TestContextLoader(unittest.TestCase):
         context_loader = ContextLoader(api_key_loader=self.mock_api_key_loader, fs_helper=self.fs_helper_mock)
 
         # First call should use the first structure
-        result = context_loader.get_directories_tree(directory, set())
+        result = context_loader.get_directories_tree(directory, context_loader.compile_ignore_patterns([]))
         expected_result = "test_dir/\n    file1.txt\n    file2.py\n    subdir/\n        file3.js\n"
         self.assertEqual(result.strip(), expected_result.strip())
 
     def test_get_directories_tree_with_ignored_paths(self):
-        directory = "/test_dir"
+        directory = "test_dir"
         
         # Define different directory structures to return
         dir_structure_1 = [
@@ -193,7 +238,7 @@ class TestContextLoader(unittest.TestCase):
         self.fs_helper_mock.list_dir.side_effect = [dir_structure_1, dir_structure_2]
 
         # Define ignored paths
-        ignore_paths = self.context_loader.normalize_paths(["/test_dir/subdir"])
+        ignore_paths = self.context_loader.compile_ignore_patterns(["test_dir/subdir/"])
 
         # Create an instance with the mocked file system helper
         context_loader = ContextLoader(api_key_loader=self.mock_api_key_loader, fs_helper=self.fs_helper_mock)
@@ -202,7 +247,7 @@ class TestContextLoader(unittest.TestCase):
         result = context_loader.get_directories_tree(directory, ignore_paths)
         
         # The ignored subdirectory should not appear in the tree
-        expected_result = "test_dir/\n    file1.txt\n    file2.py\n"
+        expected_result = "test_dir/\n    file1.txt\n    file2.py\n    subdir/"
 
         # Assert
         self.assertEqual(result.strip(), expected_result.strip())

@@ -2,6 +2,7 @@ import os
 import yaml
 import hashlib
 from pathlib import Path
+import pathspec
 from attention_forge.chain_steps.step import Step
 
 class FileSystemHelper:
@@ -63,11 +64,14 @@ class ContextLoader(Step):
     def normalize_paths(self, paths):
         return {str(Path(path).resolve()) for path in paths}
 
-    def is_path_ignored(self, path, ignore_paths):
-        abs_path = str(Path(path).resolve())
-        return any(abs_path.startswith(ignored) for ignored in ignore_paths)
+    def compile_ignore_patterns(self, ignore_patterns):
+        return pathspec.PathSpec.from_lines('gitwildmatch', ignore_patterns)
 
-    def get_directories_tree(self, directory, ignore_paths, level=0):
+    def is_path_ignored(self, path, ignore_specs):
+        rel_path = os.path.relpath(path)
+        return ignore_specs.match_file(rel_path)
+
+    def get_directories_tree(self, directory, ignore_specs, level=0):
         real_dir_path = str(Path(directory).resolve())
         if real_dir_path in self.visited_dirs:
             print(f"⏩ Already visited: {real_dir_path}, skipping to prevent recursion loop.")
@@ -77,7 +81,7 @@ class ContextLoader(Step):
         tree_repr = []
         abs_directory = self.fs_helper.list_dir(directory)
         for dirpath, dirnames, filenames in abs_directory:
-            if self.is_path_ignored(dirpath, ignore_paths):
+            if self.is_path_ignored(dirpath, ignore_specs):
                 print(f"⏩ Skipping tree generation of ignored directory: {dirpath}")
                 dirnames[:] = []  # Clear subdirectories to skip traversal
                 continue
@@ -86,27 +90,28 @@ class ContextLoader(Step):
             tree_repr.append(f'{indent}{os.path.basename(dirpath)}/')
             
             for filename in filenames:
-                tree_repr.append(f'{indent}    {filename}')
+                if not self.is_path_ignored(os.path.join(dirpath, filename), ignore_specs):
+                    tree_repr.append(f'{indent}    {filename}')
 
             sub_dirs = [os.path.join(dirpath, d) for d in dirnames]
             for sub_dir in sub_dirs:
-                sub_tree = self.get_directories_tree(sub_dir, ignore_paths, level + 1)
+                sub_tree = self.get_directories_tree(sub_dir, ignore_specs, level + 1)
                 tree_repr.append(sub_tree)
 
         return "\n".join(tree_repr)
 
-    def get_files_from_directory(self, directory, ignore_paths):
+    def get_files_from_directory(self, directory, ignore_specs):
         all_files = []
 
         for root, dirs, files in self.fs_helper.list_dir(directory):
-            if self.is_path_ignored(root, ignore_paths):
+            if self.is_path_ignored(root, ignore_specs):
                 print(f"⏩ Skipping traversal of ignored directory: {root}")
                 dirs[:] = []  # Clear dirs to skip deeper traversal
                 continue
 
             for file in files:
                 file_path = os.path.join(root, file)
-                if not self.is_path_ignored(file_path, ignore_paths):
+                if not self.is_path_ignored(file_path, ignore_specs):
                     print(f"✅ Loading file: {file_path}")
                     all_files.append(file_path)
                 else:
@@ -115,8 +120,8 @@ class ContextLoader(Step):
             # Manually traverse each subdirectory
             for d in dirs:
                 subdir_path = os.path.join(root, d)
-                if not self.is_path_ignored(subdir_path, ignore_paths):
-                    all_files.extend(self.get_files_from_directory(subdir_path, ignore_paths))
+                if not self.is_path_ignored(subdir_path, ignore_specs):
+                    all_files.extend(self.get_files_from_directory(subdir_path, ignore_specs))
                 else:
                     print(f"⏩ Ignoring directory: {subdir_path}")
 
@@ -126,15 +131,16 @@ class ContextLoader(Step):
         config = self.load_context_config()
         include_paths = config.get("include_paths", [])
         tree_paths = config.get("tree_paths", [])
-        ignore_paths = self.normalize_paths(config.get("ignore_paths", []))
+        ignore_patterns = config.get("ignore_paths", [])
 
-        api_key_files = map(str, map(Path, self.api_key_loader.get_loaded_files()))
-        ignore_paths.update(api_key_files)
+        api_key_files = self.api_key_loader.get_loaded_files()
+        # Compile ignore patterns using pathspec
+        ignore_specs = self.compile_ignore_patterns(ignore_patterns+api_key_files)
 
-        return include_paths, tree_paths, ignore_paths
+        return include_paths, tree_paths, ignore_specs
 
     def load_context(self):
-        include_paths, tree_paths, ignore_paths = self.load_config_and_ignore_paths()
+        include_paths, tree_paths, ignore_specs = self.load_config_and_ignore_paths()
         
         if not include_paths and not tree_paths:
             self.handle_no_context_case()
@@ -142,11 +148,11 @@ class ContextLoader(Step):
         loading_error = False
 
         for path in include_paths:
-            if not self.load_path_by_type(path, ignore_paths):
+            if not self.load_path_by_type(path, ignore_specs):
                 loading_error = True
 
         for dir_path in tree_paths:
-            if not self.load_tree_structure(dir_path, ignore_paths):
+            if not self.load_tree_structure(dir_path, ignore_specs):
                 loading_error = True
 
         if loading_error:
@@ -161,27 +167,27 @@ class ContextLoader(Step):
             print("Operation aborted by user.")
             exit(0)
 
-    def load_path_by_type(self, path, ignore_paths):
+    def load_path_by_type(self, path, ignore_specs):
         abs_path = str(Path(path).resolve())
         
         if self.fs_helper.is_dir(abs_path):
-            return self.process_directory(abs_path, ignore_paths)
+            return self.process_directory(abs_path, ignore_specs)
         elif self.fs_helper.is_file(abs_path):
-            return self.process_file(abs_path, ignore_paths)
+            return self.process_file(abs_path, ignore_specs)
         else:
             print(f"⚠️ Skipping invalid path: {path}")
             return False
 
-    def process_directory(self, directory, ignore_paths):
-        if self.is_path_ignored(directory, ignore_paths):
+    def process_directory(self, directory, ignore_specs):
+        if self.is_path_ignored(directory, ignore_specs):
             print(f"⏩ Ignoring directory: {directory}")
             return True
 
-        files = self.get_files_from_directory(directory, ignore_paths)
-        return all(self.process_file(file, ignore_paths) for file in files)
+        files = self.get_files_from_directory(directory, ignore_specs)
+        return all(self.process_file(file, ignore_specs) for file in files)
 
-    def process_file(self, file_path, ignore_paths):
-        if self.is_path_ignored(file_path, ignore_paths):
+    def process_file(self, file_path, ignore_specs):
+        if self.is_path_ignored(file_path, ignore_specs):
             print(f"⏩ Ignoring file: {file_path}")
             return True
 
@@ -206,14 +212,14 @@ class ContextLoader(Step):
         self.loaded_files[file_path] = formatted_content
         self.file_signatures[file_path] = self.fs_helper.calculate_signature(file_path)
 
-    def load_tree_structure(self, dir_path, ignore_paths):
+    def load_tree_structure(self, dir_path, ignore_specs):
         abs_dir_path = str(Path(dir_path).resolve())
-        if not self.fs_helper.is_dir(abs_dir_path) or self.is_path_ignored(dir_path, ignore_paths):
+        if not self.fs_helper.is_dir(abs_dir_path) or self.is_path_ignored(dir_path, ignore_specs):
             print(f"⏩ Ignoring directory for tree generation: {dir_path}")
             return True
         
         print(f"📁 Generating tree for directory: {dir_path}")
-        tree_structure = self.get_directories_tree(abs_dir_path, ignore_paths)
+        tree_structure = self.get_directories_tree(abs_dir_path, ignore_specs)
         self.loaded_files[abs_dir_path] = f"### directory `{abs_dir_path}/` structure: \n```\n{tree_structure}\n```"
         return True
 

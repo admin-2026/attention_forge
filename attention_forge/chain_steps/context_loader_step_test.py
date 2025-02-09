@@ -56,16 +56,13 @@ class TestContextLoader(unittest.TestCase):
         directory = "/test_dir"
 
         # Define different directory structures to return
-        dir_structure_1 = [
+        dir_structure = [
             (directory, ("subdir",), ("file1.txt", "file2.py")),
-        ]
-
-        dir_structure_2 = [
             (os.path.join(directory, "subdir"), (), ("file3.js",)),
         ]
 
-        # Use side_effect to simulate different states of the directory structure
-        self.fs_helper_mock.list_dir.side_effect = [dir_structure_1, dir_structure_2]
+        # Use return_value to simulate different states of the directory structure
+        self.fs_helper_mock.list_dir.return_value = dir_structure
 
         ignore_paths = self.context_loader.compile_ignore_patterns([])
         expected_files = [
@@ -87,16 +84,13 @@ class TestContextLoader(unittest.TestCase):
         directory = "test_dir"
         
         # Define a directory structure
-        dir_structure_1 = [
+        dir_structure = [
             (directory, ("subdir",), ("file1.txt", "file2.py")),
-        ]
-
-        dir_structure_2 = [
             (os.path.join(directory, "subdir"), (), ("file3.js",)),
         ]
 
-        # Use side_effect to simulate different states of the directory structure
-        self.fs_helper_mock.list_dir.side_effect = [dir_structure_1, dir_structure_2]
+        # Use return_value to simulate different states of the directory structure
+        self.fs_helper_mock.list_dir.return_value = dir_structure
 
         # Define ignored paths
         ignore_paths = self.context_loader.compile_ignore_patterns(["/test_dir/subdir/"])
@@ -119,16 +113,13 @@ class TestContextLoader(unittest.TestCase):
     def test_get_files_from_directory_with_ignored_glob_patterns(self):
         directory = "test_dir"
         # Define a directory structure
-        dir_structure_1 = [
+        dir_structure = [
             (directory, ("subdir",), ("file1.txt", "file2.py")),
-        ]
-
-        dir_structure_2 = [
             (os.path.join(directory, "subdir"), (), ("file3.js",)),
         ]
 
-        # Use side_effect to simulate different states of the directory structure
-        self.fs_helper_mock.list_dir.side_effect = [dir_structure_1, dir_structure_2]
+        # Use return_value to simulate different states of the directory structure
+        self.fs_helper_mock.list_dir.return_value = dir_structure
 
         context_loader = ContextLoader(
             api_key_loader=self.mock_api_key_loader,
@@ -200,19 +191,16 @@ class TestContextLoader(unittest.TestCase):
         self.assertEqual(self.context_loader.file_signatures[fake_file_path], "fake_signature")
 
     def test_get_directories_tree(self):
-        directory = "/test_dir"
+        directory = "test_dir"
 
         # Define different directory structures to return
-        dir_structure_1 = [
-            (directory, ["subdir"], ["file1.txt", "file2.py"])
-        ]
-
-        dir_structure_2 = [
+        dir_structure = [
+            (directory, ["subdir"], ["file1.txt", "file2.py"]),
             (os.path.join(directory, "subdir"), [], ["file3.js"])
         ]
 
-        # Assign side_effect to simulate different directory states
-        self.fs_helper_mock.list_dir.side_effect = [dir_structure_1, dir_structure_2]
+        # Assign return_value to simulate different directory states
+        self.fs_helper_mock.list_dir.return_value = dir_structure
 
         # Create an instance with the mocked file system helper
         context_loader = ContextLoader(api_key_loader=self.mock_api_key_loader, fs_helper=self.fs_helper_mock)
@@ -226,16 +214,13 @@ class TestContextLoader(unittest.TestCase):
         directory = "test_dir"
         
         # Define different directory structures to return
-        dir_structure_1 = [
-            (directory, ["subdir"], ["file1.txt", "file2.py"])
-        ]
-
-        dir_structure_2 = [
+        dir_structure = [
+            (directory, ["subdir"], ["file1.txt", "file2.py"]),
             (os.path.join(directory, "subdir"), [], ["file3.js"])
         ]
 
-        # Assign side_effect to simulate different directory states
-        self.fs_helper_mock.list_dir.side_effect = [dir_structure_1, dir_structure_2]
+        # Assign return_value to simulate different directory states
+        self.fs_helper_mock.list_dir.return_value = dir_structure
 
         # Define ignored paths
         ignore_paths = self.context_loader.compile_ignore_patterns(["test_dir/subdir/"])

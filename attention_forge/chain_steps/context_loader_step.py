@@ -71,32 +71,32 @@ class ContextLoader(Step):
         rel_path = os.path.relpath(path)
         return ignore_specs.match_file(rel_path)
 
-    def get_directories_tree(self, directory, ignore_specs, level=0):
-        real_dir_path = str(Path(directory).resolve())
-        if real_dir_path in self.visited_dirs:
-            print(f"⏩ Already visited: {real_dir_path}, skipping to prevent recursion loop.")
+    def get_directories_tree(self, directory, ignore_specs):
+        if directory in self.visited_dirs:
+            print(f"⏩ Already visited: {directory}, skipping to prevent recursion loop.")
             return ""
 
-        self.visited_dirs.add(real_dir_path)
         tree_repr = []
-        abs_directory = self.fs_helper.list_dir(directory)
-        for dirpath, dirnames, filenames in abs_directory:
+        base_depth = len(Path(directory).parts)
+
+        for dirpath, dirnames, filenames in self.fs_helper.list_dir(directory):
+            self.visited_dirs.add(dirpath)
             if self.is_path_ignored(dirpath, ignore_specs):
                 print(f"⏩ Skipping tree generation of ignored directory: {dirpath}")
                 dirnames[:] = []  # Clear subdirectories to skip traversal
                 continue
+            
+            # Calculate depth for indentation
+            current_depth = len(Path(dirpath).parts) - base_depth
 
-            indent = '    ' * level
+            indent = '    ' * current_depth
             tree_repr.append(f'{indent}{os.path.basename(dirpath)}/')
             
+            # Increase the level of indentation for files
+            file_indent = '    ' * (current_depth + 1)
             for filename in filenames:
                 if not self.is_path_ignored(os.path.join(dirpath, filename), ignore_specs):
-                    tree_repr.append(f'{indent}    {filename}')
-
-            sub_dirs = [os.path.join(dirpath, d) for d in dirnames]
-            for sub_dir in sub_dirs:
-                sub_tree = self.get_directories_tree(sub_dir, ignore_specs, level + 1)
-                tree_repr.append(sub_tree)
+                    tree_repr.append(f'{file_indent}{filename}')
 
         return "\n".join(tree_repr)
 
@@ -116,15 +116,6 @@ class ContextLoader(Step):
                     all_files.append(file_path)
                 else:
                     print(f"⏩ Ignoring file: {file_path}")
-
-            # Manually traverse each subdirectory
-            for d in dirs:
-                subdir_path = os.path.join(root, d)
-                if not self.is_path_ignored(subdir_path, ignore_specs):
-                    all_files.extend(self.get_files_from_directory(subdir_path, ignore_specs))
-                else:
-                    print(f"⏩ Ignoring directory: {subdir_path}")
-
         return all_files
 
     def load_config_and_ignore_paths(self):

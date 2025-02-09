@@ -112,7 +112,7 @@ class ContextLoader(Step):
             for file in files:
                 file_path = os.path.join(root, file)
                 if not self.is_path_ignored(file_path, ignore_specs):
-                    print(f"✅ Loading file: {file_path}")
+                    # print(f"✅ Loading file: {file_path}")
                     all_files.append(file_path)
                 else:
                     print(f"⏩ Ignoring file: {file_path}")
@@ -129,15 +129,40 @@ class ContextLoader(Step):
 
     def load_config_and_ignore_paths(self):
         config = self.load_context_config()
+
+        # Read the flag from the config, default to True if not present
+        use_gitignore_for_ignore_paths = config.get("use_gitignore_for_ignore_paths", True)
+
         include_paths = config.get("include_paths", [])
         tree_paths = config.get("tree_paths", [])
         ignore_patterns = config.get("ignore_paths", [])
 
+        if use_gitignore_for_ignore_paths:
+            gitignore_patterns = self.load_gitignore_patterns()
+            
+            # Append gitignore_patterns to ignore_patterns
+            ignore_patterns.extend(gitignore_patterns)
+
         api_key_files = self.api_key_loader.get_loaded_files()
+        
         # Compile ignore patterns using pathspec
-        ignore_specs = self.compile_ignore_patterns(ignore_patterns+api_key_files)
+        ignore_specs = self.compile_ignore_patterns(ignore_patterns + api_key_files)
 
         return include_paths, tree_paths, ignore_specs
+
+    def load_gitignore_patterns(self):
+        """
+        Reads patterns from .gitignore if available and returns them as a list.
+        Prints a message if .gitignore is found/not found.
+        """
+        gitignore_file = '.gitignore'
+        if self.fs_helper.is_file(gitignore_file):
+            print(f"📄 .gitignore found. Loading ignore patterns from {gitignore_file}")
+            gitignore_content = self.fs_helper.read_file(gitignore_file)
+            return gitignore_content.splitlines()
+        else:
+            print("ℹ️ No .gitignore file found.")
+            return []
 
     def load_context(self):
         include_paths, tree_paths, ignore_specs = self.load_config_and_ignore_paths()

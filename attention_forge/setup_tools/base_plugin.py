@@ -13,7 +13,8 @@ class BaseSetupPlugin:
     context_defaults = {
         'include_paths': ['./src', './scripts'],
         'tree_paths': ['./'],
-        'ignore_paths': ['.attention_forge/', './.git/', 'api-key', 'venv/']
+        'ignore_paths': ['.attention_forge/', './.git/', 'api-key', 'venv/'],
+        'use_gitignore_for_ignore_paths': True  # New field added here
     }
 
     def create_build_directory(self):
@@ -34,8 +35,10 @@ class BaseSetupPlugin:
             file.write("# Context Configuration File\n")
             file.write("# This file defines various paths that will be considered during the during the conversation with AI.\n")
             file.write("#\n")
+
             for key, value in BaseSetupPlugin.context_defaults.items():
                 file.write("\n\n")
+                # Additional comments explaining fields
                 if key == 'include_paths':
                     file.write("# Include Paths:\n")
                     file.write("# These are files or directories whose content will be included\n")
@@ -47,14 +50,18 @@ class BaseSetupPlugin:
                 elif key == 'ignore_paths':
                     file.write("# Ignore Paths:\n")
                     file.write("# These are files or directories to be excluded from context loading.\n")
-                    file.write("# Typically, you can ignore build artifacts, caches, binaries, etc.\n")
+                    file.write("# Follows the .gitignore style, typically including build artifacts, caches, binaries, etc.\n")
+                elif key == 'use_gitignore_for_ignore_paths':
+                    file.write("# Use .gitignore for Ignore Paths:\n")
+                    file.write("# This option allows the loading mechanism to fetch exclude paths defined in .gitignore.\n")
 
                 file.write("\n")
-                file.write(f"# {key}:\n")
-                for item in value:
-                    file.write(f"# - {item}\n")
-                
-            file.write("\n")
+                if isinstance(value, list):
+                    file.write(f"# {key}:\n")
+                    for item in value:
+                        file.write(f"# - {item}\n")
+                else:
+                    file.write(f"{key}: {value}\n")  # Adding the boolean directly as True/False
 
         print(f"✅ Initialized {BaseSetupPlugin.CONTEXT_FILE} with default values.")
 

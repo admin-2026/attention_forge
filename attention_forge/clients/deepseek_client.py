@@ -24,18 +24,33 @@ class DeepSeekClient(BaseClient):
             "stream": False
         }
 
-        response = requests.post("https://api.deepseek.com/chat/completions", headers=headers, json=payload)
-        response.raise_for_status()
-        response_json = response.json()
+        try:
+            response = requests.post("https://api.deepseek.com/chat/completions", headers=headers, json=payload)
+            response.raise_for_status()
 
-        assistant_reply = response_json["choices"][0]["message"]["content"]
-        request_data = {"model": self.model, "messages": messages}
+            if not response.content:
+                raise ValueError("The server is busy. Please try again later.")
 
-        token_usage = {
-            "prompt_tokens": response_json.get('usage', {}).get('prompt_tokens', None),
-            "completion_tokens": response_json.get('usage', {}).get('completion_tokens', None),
-            "total_tokens": response_json.get('usage', {}).get('total_tokens', None)
-        }
+            response_json = response.json()
 
-        response_data = {"response": assistant_reply, "usage": token_usage}
-        return request_data, response_data, assistant_reply
+            assistant_reply = response_json["choices"][0]["message"]["content"]
+            request_data = {"model": self.model, "messages": messages}
+
+            token_usage = {
+                "prompt_tokens": response_json.get('usage', {}).get('prompt_tokens', None),
+                "completion_tokens": response_json.get('usage', {}).get('completion_tokens', None),
+                "total_tokens": response_json.get('usage', {}).get('total_tokens', None)
+            }
+
+            response_data = {"response": assistant_reply, "usage": token_usage}
+            return request_data, response_data, assistant_reply
+
+        except requests.exceptions.HTTPError as http_err:
+            print(f"HTTP error occurred: {http_err}")
+            raise
+        except ValueError as val_err:
+            print(val_err)
+            raise
+        except Exception as err:
+            print(f"An error occurred: {err}")
+            raise

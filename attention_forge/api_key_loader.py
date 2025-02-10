@@ -37,8 +37,13 @@ class ApiKeyLoader:
                 if key_config:
                     client_name = key_config.get("client")
                     api_key = key_config.get("key")
-                    if client_name and api_key:
-                        self.api_key_map[client_name] = api_key
+                    if client_name:
+                        if api_key is None:
+                            print(f"❗Warning: API key value for client '{client_name}' is missing. You can add an API key using: attention-forge-init --key")
+                        elif api_key == "":
+                            print(f"❗Warning: API key for client '{client_name}' is an empty string. You can add an API key using: attention-forge-init --key")
+                        else:
+                            self.api_key_map[client_name] = api_key
                 # Track the loaded file path
                 self.loaded_files.append(str(file_path))
             except yaml.YAMLError as e:
@@ -47,7 +52,7 @@ class ApiKeyLoader:
     def get_api_key(self, client_name):
         """Return the API key for the given client name. Show warning if not found."""
         if client_name not in self.api_key_map:
-            print(f"Warning: API key for client '{client_name}' not found.")
+            print(f"❗Warning: API key for client '{client_name}' not found. You can add an API key using: attention-forge-init --key")
             return ""
         return self.api_key_map[client_name]
 

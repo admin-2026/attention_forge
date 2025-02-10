@@ -1,9 +1,8 @@
-# setup_tool.py
-
 import importlib
 import os
-
+import argparse
 from attention_forge.setup_tools.base_plugin import BaseSetupPlugin
+from attention_forge.setup_tools.api_key_creator import APIKeyCreator
 
 PLUGIN_FOLDER = os.path.join(os.path.dirname(__file__), 'plugins')
 
@@ -39,11 +38,31 @@ def load_plugins():
 
     return plugins
 
+def create_api_key():
+    client_name = input("Enter the client name for which you want to create an API key: ").strip()
+    if not client_name:
+        print("Error: Client name cannot be empty.")
+        return
+    
+    api_key_creator = APIKeyCreator(client_name)
+    api_key_file = api_key_creator.create_api_key_file()
+    if api_key_file:
+        print(f"API key file created at: {api_key_file}")
+
 def main():
+    parser = argparse.ArgumentParser(description='Setup tools for Attention Forge.')
+    parser.add_argument('--key', help='Create API key file for a given client.', action='store_true')
+    
+    args = parser.parse_args()
+
+    if args.key:
+        create_api_key()
+        return
+
     plugins = load_plugins()
 
     client_choice = input(f"Available clients: {', '.join(plugins.keys())}. Select the client for setup: ").strip().lower()
-    if not client_choice in plugins:
+    if client_choice not in plugins:
         print(f"❌ Client '{client_choice}' not recognized. Please ensure it's spelled correctly and try again.")
         return
 

@@ -27,11 +27,17 @@ Ready to dive in? Let's get your setup started!
    attention-forge-init
    ```
 
+3. **Create API Key** (Optional):  
+   If you need to generate an API key file for your chosen client, you can run:
+   ```bash
+   attention-forge-init --key
+   ```
+   This will prompt you to enter your client name and create the appropriate API key file.
+
 ### Using Attention Forge
 
 **Provide Context**:
 Open the `attention_forge_context.yaml` and provide some context for your conversation. The amount of tokens your LLM can take is probably limited. You don't want to include everything at once. Select your context with care.
-
 
 **Start Chatting with AI**:
 To engage with the AI, use:

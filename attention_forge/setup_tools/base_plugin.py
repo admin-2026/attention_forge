@@ -1,3 +1,4 @@
+from attention_forge.setup_tools.api_key_creator import APIKeyCreator
 import yaml
 import os
 from importlib.resources import files
@@ -14,7 +15,7 @@ class BaseSetupPlugin:
         'include_paths': ['./src', './scripts'],
         'tree_paths': ['./'],
         'ignore_paths': ['.attention_forge/', './.git/', 'api-key', 'venv/'],
-        'use_gitignore_for_ignore_paths': True  # New field added here
+        'use_gitignore_for_ignore_paths': True
     }
 
     def create_build_directory(self):
@@ -38,7 +39,6 @@ class BaseSetupPlugin:
 
             for key, value in BaseSetupPlugin.context_defaults.items():
                 file.write("\n\n")
-                # Additional comments explaining fields
                 if key == 'include_paths':
                     file.write("# Include Paths:\n")
                     file.write("# These are files or directories whose content will be included\n")
@@ -61,14 +61,14 @@ class BaseSetupPlugin:
                     for item in value:
                         file.write(f"# - {item}\n")
                 else:
-                    file.write(f"{key}: {value}\n")  # Adding the boolean directly as True/False
+                    file.write(f"{key}: {value}\n")
 
         print(f"✅ Initialized {BaseSetupPlugin.CONTEXT_FILE} with default values.")
 
     def create_user_message_file(self):
         if not os.path.exists(BaseSetupPlugin.USER_MESSAGE_FILE):
             with open(BaseSetupPlugin.USER_MESSAGE_FILE, 'w') as f:
-                pass  # Create the file without writing anything
+                pass
             print(f"✅ Created {BaseSetupPlugin.USER_MESSAGE_FILE}.")
         else:
             print(f"ℹ️ {BaseSetupPlugin.USER_MESSAGE_FILE} already exists.")
@@ -101,48 +101,23 @@ class BaseSetupPlugin:
         if not client_name:
             print("Error: 'client' not found in project configuration.")
             return
-
-        # Calculate paths
-        api_keys_dir = files('attention_forge').joinpath('api-keys')
-        client_key_file_in_package = api_keys_dir / f"{client_name}-key.yaml"
-
-        # Ensure the api-keys directory exists
-        if not api_keys_dir.exists():
-            print(f"Creating directory: {api_keys_dir}")
-            os.makedirs(api_keys_dir)
-
-        if client_key_file_in_package.exists():
-            choice = input(f"Found existing API key file for client '{client_name}' in the package. Do you want to use it? (yes/no): ").strip().lower()
-            if choice == "yes":
-                print("Exiting: Using the existing API key.")
-                return
-
-        # If file wasn't found or not using the existing file, ask for a new API key
-        api_key = input(f"Enter the API key for client '{client_name}': ").strip()
-        if not api_key:
-            print("Error: No API key provided. Aborting.")
+        
+        # Utilize the APIKeyCreator to handle the API key logic
+        api_key_creator = APIKeyCreator(client_name)
+        api_key_file_path = api_key_creator.create_api_key_file()
+        
+        if not api_key_file_path:
+            print("Error: API key file creation aborted.")
             return
 
-        # Store the new API key file in the api-keys directory within the package
-        new_key_file_content = {
-            "client": client_name,
-            "key": api_key
-        }
-
-        with open(client_key_file_in_package, 'w') as f:
-            yaml.dump(new_key_file_content, f, default_flow_style=False)
-        print(f"✅ Created {client_key_file_in_package} with the provided API key.")
-
         # Update the project configuration to have the new api-key-file entry
-        project_config['api-key-file'] = str(client_key_file_in_package)
-        print(f"ℹ️ Updated project configuration with 'api-key-file': {client_key_file_in_package}")
+        project_config['api-key-file'] = str(api_key_file_path)
+        print(f"ℹ️ Updated project configuration with 'api-key-file': {api_key_file_path}")
 
     def generate_project_config(self):
-        """Run the setup configuration for the plugin."""
         raise NotImplementedError("Subclasses should implement this method.")
 
     def update_project_yaml(self, config):
-        """Update the project YAML with provided configuration."""
         if os.path.exists(self.PROJECT_FILE):
             choice = input(f"{self.PROJECT_FILE} already exists. Do you want to overwrite it? (yes/no): ").strip().lower()
             if choice != 'yes':

@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="attention_forge",
-    version="0.2.2",
+    version="0.2.7",
     description="A tool for AI-assisted coding with automated file updates and backups.",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
